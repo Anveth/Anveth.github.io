@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameLogs</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <script defer src="script.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="navbar">
+            <nav>
+                <ul>
+                    <li class="gameLogs" onClick="topFunction()">GameLogs</li>
+                    <li class="mainUl" onClick="bottomFunction()">Screens</li>
+                    <a href="dice.html" target="_blank">
+                        <li class="mainUl">Random Game</li>
+                    </a>
+                    <li class="mainUl" onClick="bottomFunction()">Contact</li>
+                    <!-- Here dark mode -->
+                    <img src="svg/sun.png" id="icon">
+                    <img src="svg/shoppingCartWhite.png" id="iconCart">
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/god-of-war-ragnarok/" target="_blank">
+                        <img class="gamePhotos" src="images/GoWR.png" alt="Gra 1" data-name="God of War Ragnarok">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">39.99$</p>
+                            <button class="addToCart" data-product="God of War Ragnarök" data-price="39.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/dishonored/" target="_blank">
+                        <img class="gamePhotos" src="images/Dishonored.jpg" alt="Gra 2">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">8.99$</p>
+                            <button class="addToCart" data-product="Dishonored" data-price="8.99">Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/fable-the-lost-chapters/" target="_blank">
+                        <img class="gamePhotos" src="images/Fable.png" alt="Gra 3">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">7.99$</p>
+                            <button class="addToCart" data-product="Fable" data-price="7.99">Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/the-elder-scrolls-v-skyrim/" target="_blank">
+                        <img class="gamePhotos" src="images/Skyrim.jpg" alt="Gra 4">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">17.99$</p>
+                            <button class="addToCart" data-product="TES V Skyrim" data-price="17.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/dark-souls-iii/" target="_blank">
+                        <img class="gamePhotos" src="images/darkSouls3.png" alt="Gra 5">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">49.99$</p>
+                            <button class="addToCart" data-product="Dark Souls III" data-price="49.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/sekiro-shadows-die-twice/" target="_blank">
+                        <img class="gamePhotos" src="images/sekiro.jpg" alt="Gra 6">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">49.99$</p>
+                            <button class="addToCart" data-product="Sekiro: Shadows Die Twice" data-price="49.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/the-witcher-3:-wild-hunt/" target="_blank">
+                        <img class="gamePhotos" src="images/Witcher3.jpg" alt="Gra 7">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">9.99$</p>
+                            <button class="addToCart" data-product="The Witcher 3: Wild Hunt" data-price="9.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/hogwarts-legacy/" target="_blank">
+                        <img class="gamePhotos" src="images/Hogwarts.png" alt="Gra 8">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">59.99$</p>
+                            <button class="addToCart" data-product="Hogwarts legacy" data-price="59.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/cyberpunk-2077/" target="_blank">
+                        <img class="gamePhotos" src="images/cyberpunk.jpg" alt="Gra 1">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">25.99$</p>
+                            <button class="addToCart" data-product="Cyberpunk 2077" data-price="25.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/the-last-of-us-part-i/" target="_blank">
+                        <img class="gamePhotos" src="images/tlou.jpg" alt="Gra 2">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">59.99$</p>
+                            <button class="addToCart" data-product="The Last of Us Part I" data-price="59.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/ghost-of-tsushima-directors-cut/" target="_blank">
+                        <img class="gamePhotos" src="images/ghostOfTsushima.jpg" alt="Gra 3">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">59.99$</p>
+                            <button class="addToCart" data-product="Ghost of Tsushima" data-price="59.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/life-is-strange/" target="_blank">
+                        <img class="gamePhotos" src="images/lifeIsStrange.jpg" alt="Gra 4">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">15.99$</p>
+                            <button class="addToCart" data-product="Life is strange" data-price="15.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/fallout-4/" target="_blank">
+                        <img class="gamePhotos" src="images/fallout4.jpg" alt="Gra 1">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">19.99$</p>
+                            <button class="addToCart" data-product="Fallout 4" data-price="19.99">Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/the-walking-dead-a-telltale-games-series/" target="_blank">
+                        <img class="gamePhotos" src="images/twd.jpg" alt="Gra 2">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">14.99$</p>
+                            <button class="addToCart" data-product="The Walking Dead" data-price="14.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/dying-light-2-stay-human/" target="_blank">
+                        <img class="gamePhotos" src="images/dl2.jpeg" alt="Gra 3">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">49.99$</p>
+                            <button class="addToCart" data-product="Dying Light 2" data-price="49.99">Add to
+                                cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/elden-ring/" target="_blank">
+                        <img class="gamePhotos" src="images/eldenRing.png" alt="Gra 4">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder">
+                            <p class="pPrice">59.99$</p>
+                            <button class="addToCart" data-product="Elden Ring" data-price="59.99">Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="cart">
+                <p id="shopTitle">Shopping Cart</p>
+                <ul id="cartItems"></ul>
+                <p id="totalPriceFinal">Total: <span id="totalPrice">0.00</span>$</p>
+                <button id="checkoutButton">Checkout</button>
+            </div>
+        </section>
+
+    </main>
+    <article id="article">
+        <div class="containerSlider">
+            <div class="sliderWrapper">
+                <button id="previousSlide" class="sliderButton">&lt;</button>
+                <div class="imageList">
+                    <img src="images/slider/witcher3-1.png" title="The Witcher 3: Wild Hunt" alt="img-1"
+                        class="imageItem" onclick="imageOpen1()">
+                    <img src="images/slider/witcher3-2.png" title="The Witcher 3: Wild Hunt" alt="img-2"
+                        class="imageItem" onclick="imageOpen2()">
+                    <img src="images/slider/witcher3-3.png" title="The Witcher 3: Wild Hunt" alt="img-3"
+                        class="imageItem" onclick="imageOpen3()">
+                    <img src="images/slider/witcher-4.jpg" title="The Witcher 3: Wild Hunt" alt="img-4"
+                        class="imageItem" onclick="imageOpen4()">
+                    <img src="images/slider/cyberpunk-1.jpg" title="Cyberpunk 2077" alt="img-5" class="imageItem"
+                        onclick="imageOpen5()">
+                    <img src="images/slider/cyberpunk-2.jpg" title="Cyberpunk 2077" alt="img-6" class="imageItem"
+                        onclick="imageOpen6()">
+                    <img src="images/slider/cyberpunk-3.jpg" title="Cyberpunk 2077" alt="img-7" class="imageItem"
+                        onclick="imageOpen7()">
+                    <img src="images/slider/cyberpunk-4.jpg" title="Cyberpunk 2077" alt="img-8" class="imageItem"
+                        onclick="imageOpen8()">
+                    <img src="images/slider/dishonored-1.jpg" title="Dishonored" alt="img-9" class="imageItem"
+                        onclick="imageOpen9()">
+                    <img src="images/slider/dishonored-2.jpg" title="Dishonored" alt="img-10" class="imageItem"
+                        onclick="imageOpen10()">
+                    <img src="images/slider/got-1.jpg" title="Ghost of Tsushima" alt="img-11" class="imageItem"
+                        onclick="imageOpen11()">
+                    <img src="images/slider/got-2.jpg" title="Ghost of Tsushima" alt="img-12" class="imageItem"
+                        onclick="imageOpen12()">
+                    <img src="images/slider/gow-rag-1.jpg" title="God of War Ragnarök" alt="img-13" class="imageItem"
+                        onclick="imageOpen13()">
+                    <img src="images/slider/gow-rag-2.png" title="God of War Ragnarök" alt="img-14" class="imageItem"
+                        onclick="imageOpen14()">
+                    <img src="images/slider/Sekiro-1.jpg" title="Sekiro: Shadows Die Twice" alt="img-15"
+                        class="imageItem" onclick="imageOpen15()">
+                    <img src="images/slider/hogwarts-1.png" title="Hogwarts legacy" alt="img-16" class="imageItem"
+                        onclick="imageOpen16()">
+                    <img src="images/slider/elden-1.jpg" title="Elden Ring" alt="img-17" class="imageItem"
+                        onclick="imageOpen17()">
+                    <img src="images/slider/lis-1.jpg" title="Life is strange" alt="img-18" class="imageItem"
+                        onclick="imageOpen18()">
+                </div>
+                <button id="nextSlide" class="sliderButton">&gt;</button>
+            </div>
+            <div class="sliderScrollbar">
+                <div class="scrollbarTrack">
+                    <div class="scrollbarThumb"></div>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <footer id="footer">
+        <div class="containerFooter">
+            <p id="pFooter"><span id="footerGameLogs" onClick="topFunction()">⟳ GameLogs 2024</span> | Paweł
+                Szabunio <a href="https://www.merito.pl" target="_blank">| Merito</a><a href="https://www.facebook.com"
+                    target="_blank"><img src="svg/fb.png" class="contactIcons" id="fbLeft"></a><a
+                    href="https://www.youtube.com" target="_blank"><img src="svg/youtube.png"
+                        class="contactIcons"></a><a href="https://www.instagram.com" target="_blank"><img
+                        src="svg/insta.png" class="contactIcons"><a><a href="https://www.x.com" target="_blank"><img
+                                src="svg/x.png" class="contactIcons"></a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

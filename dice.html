@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <script defer src="script.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="navbar">
+            <nav>
+                <ul>
+                    <a href="index.html">
+                        <li class="gameLogs">GameLogs</li>
+                    </a>
+                    <a href="index.html#article">
+                        <li class="mainUl">Screens</li>
+                    </a>
+                    <a href="dice.html">
+                        <li class="mainUl">Random Game</li>
+                    </a>
+                    <a href="index.html#footer">
+                        <li class="mainUl">Contact</li>
+                    </a>
+                    <img src="svg/sun.png" id="icon">
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/god-of-war-ragnarok/" target="_blank">
+                        <img class="gamePhotos" src="images/GoWR.png" alt="Gra 1" data-name="God of War Ragnarok">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 1 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/dishonored/" target="_blank">
+                        <img class="gamePhotos" src="images/Dishonored.jpg" alt="Gra 2">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 2 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/fable-the-lost-chapters/" target="_blank">
+                        <img class="gamePhotos" src="images/Fable.png" alt="Gra 3">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 3 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/the-elder-scrolls-v-skyrim/" target="_blank">
+                        <img class="gamePhotos" src="images/Skyrim.jpg" alt="Gra 4">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 4 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/dark-souls-iii/" target="_blank">
+                        <img class="gamePhotos" src="images/darkSouls3.png" alt="Gra 5">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 5 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/sekiro-shadows-die-twice/" target="_blank">
+                        <img class="gamePhotos" src="images/sekiro.jpg" alt="Gra 6">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 6 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/the-witcher-3:-wild-hunt/" target="_blank">
+                        <img class="gamePhotos" src="images/Witcher3.jpg" alt="Gra 7">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 7 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="gameContainer">
+                <div class="game">
+                    <a href="https://www.metacritic.com/game/hogwarts-legacy/" target="_blank">
+                        <img class="gamePhotos" src="images/Hogwarts.png" alt="Gra 8">
+                    </a>
+                    <div class="containerPriceTitle">
+                        <div class="priceHolder" id="diceHolder">
+                            <p id="pPrice"><span id="numberColor">( 8 )</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Dice animation and numbers when generated -->
+    <div id="diceWrapper">
+        <div id="rng">
+            <span id="diceAnimation"></span>
+        </div>
+        <div id="diceInputWrapper">
+            <input id="maxNum" type="text" autocomplete="off" autofocus placeholder="----">
+        </div>
+        <div id="diceButtonWrapper">
+            <button id="diceButton" onclick="randomN()">
+                <div id="text">Generate</div>
+            </button>
+        </div>
+    </div>
+
+</body>
+
+</html>
