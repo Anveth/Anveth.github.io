@@ -355,7 +355,7 @@ article {
 }
 
 .sliderWrapper .sliderButton {
-  bottom: -270px;
+  bottom: -3%;
   position: absolute;
   height: 40px;
   width: 40px;
@@ -367,12 +367,12 @@ article {
 }
 
 .sliderWrapper .sliderButton#previousSlide {
-  left: 30px;
+  left: 2%;
   display: none;
 }
 
 .sliderWrapper .sliderButton#nextSlide {
-  right: 30px;
+  right: 2%;
 }
 
 .sliderWrapper .imageList {
