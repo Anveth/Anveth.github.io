@@ -288,16 +288,14 @@ main section #cart #checkoutButton:hover {
     flex-basis: 50%;
   }
 }
-@media (min-width: 2500px) {
+@media (min-width: 2000px) {
   main section .gameContainer {
-    padding-left: 30px;
-    padding-right: 30px;
+    flex-basis: 10%;
   }
 }
 @media (min-width: 3840px) {
   main section .gameContainer {
-    margin-left: 120px;
-    margin-right: 120px;
+    flex-basis: 10%;
   }
 }
 @media (min-width: 1800px) {
