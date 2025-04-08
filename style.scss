@@ -335,12 +335,24 @@ main {
     main section .gameContainer {
         flex-basis: calc(100% / 10);
     }
+    #previousSlide {
+        bottom: 10%;
+    }
+    #nextSlide {
+        bottom: 10%;
+    }
 }
 
 // 4k
 @media (min-width: 3840px) {
     main section .gameContainer {
         flex-basis: calc(100% / 10);
+    }
+    #previousSlide {
+        bottom: 10%;
+    }
+    #nextSlide {
+        bottom: 10%;
     }
 }
 
@@ -402,7 +414,7 @@ article {
 }
 
 .sliderWrapper .sliderButton {
-    bottom: -270px;
+    bottom: 10%;
     position: absolute;
     height: 40px;
     width: 40px;
