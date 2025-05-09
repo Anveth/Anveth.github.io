@@ -292,10 +292,22 @@ main section #cart #checkoutButton:hover {
   main section .gameContainer {
     flex-basis: 10%;
   }
+  #previousSlide {
+    bottom: 10%;
+  }
+  #nextSlide {
+    bottom: 10%;
+  }
 }
 @media (min-width: 3840px) {
   main section .gameContainer {
     flex-basis: 10%;
+  }
+  #previousSlide {
+    bottom: 10%;
+  }
+  #nextSlide {
+    bottom: 10%;
   }
 }
 @media (min-width: 1800px) {
@@ -355,7 +367,7 @@ article {
 }
 
 .sliderWrapper .sliderButton {
-  bottom: -3%;
+  bottom: 10%;
   position: absolute;
   height: 40px;
   width: 40px;
@@ -367,12 +379,12 @@ article {
 }
 
 .sliderWrapper .sliderButton#previousSlide {
-  left: 2%;
+  left: 30px;
   display: none;
 }
 
 .sliderWrapper .sliderButton#nextSlide {
-  right: 2%;
+  right: 30px;
 }
 
 .sliderWrapper .imageList {
