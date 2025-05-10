@@ -370,6 +370,13 @@ main {
     }
 }
 
+@media (max-width: 803px) {
+    main section .gameContainer {
+        padding-left: 5vh;
+        padding-right: 5vh;
+    }
+}
+
 @media (max-width: 603px) {
     #iconCart {
         margin-top: 20px; 
