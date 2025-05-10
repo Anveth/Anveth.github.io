@@ -77,7 +77,6 @@ header {
             background-color: var(--2-color);
             padding: 0.1em;
             margin-bottom: 1.875em;
-
             ul {
                 list-style: none;
                 margin-bottom: 10px;
@@ -362,18 +361,10 @@ main {
         padding-right: 30px;
     }
 }
-
-@media (max-width: 1800px) {
+@media (max-width: 1200px) {
     main section .gameContainer {
-        padding-left: 10vh;
-        padding-right: 10vh;
-    }
-}
-
-@media (max-width: 803px) {
-    main section .gameContainer {
-        padding-left: 5vh;
-        padding-right: 5vh;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 

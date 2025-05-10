@@ -316,16 +316,10 @@ main section #cart #checkoutButton:hover {
     padding-right: 30px;
   }
 }
-@media (max-width: 1800px) {
+@media (max-width: 1200px) {
   main section .gameContainer {
-    padding-left: 10vh;
-    padding-right: 10vh;
-  }
-}
-@media (max-width: 803px) {
-  main section .gameContainer {
-    padding-left: 5vh;
-    padding-right: 5vh;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 @media (max-width: 603px) {
