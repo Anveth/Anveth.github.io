@@ -74,7 +74,7 @@ header .navbar nav {
   text-align: center;
   background-color: var(--2-color);
   padding: 0.1em;
-  margin-bottom: 1.875em;
+  margin-bottom: 6%;
 }
 header .navbar nav ul {
   list-style: none;
@@ -133,6 +133,14 @@ header .navbar nav ul #iconCart {
 }
 header .navbar nav ul #iconCart:hover {
   cursor: pointer;
+}
+
+#nextSlide {
+  bottom: -29%;
+}
+
+#previousSlide {
+  bottom: -29%;
 }
 
 main section {
@@ -293,10 +301,10 @@ main section #cart #checkoutButton:hover {
     flex-basis: 10%;
   }
   #previousSlide {
-    bottom: 10%;
+    bottom: -22%;
   }
   #nextSlide {
-    bottom: 10%;
+    bottom: -22%;
   }
 }
 @media (min-width: 3840px) {
@@ -340,8 +348,8 @@ article {
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  margin-bottom: 55px;
-  margin-top: 55px;
+  margin-bottom: 9%;
+  margin-top: 10%;
 }
 
 .containerSlider {
@@ -387,6 +395,7 @@ article {
 .sliderWrapper .sliderButton#previousSlide {
   left: 30px;
   display: none;
+  margin-top: 20%;
 }
 
 .sliderWrapper .sliderButton#nextSlide {
@@ -633,4 +642,14 @@ aside .cartTab .btnShop {
   width: 100px;
   text-align: center;
   outline: none;
+}
+
+@media (min-width: 2000px) {
+  article {
+    margin-top: 16%;
+    margin-bottom: 12%;
+  }
+  section {
+    margin-top: 8%;
+  }
 }/*# sourceMappingURL=style.css.map */

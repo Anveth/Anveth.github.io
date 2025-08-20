@@ -76,7 +76,8 @@ header {
             text-align: center;
             background-color: var(--2-color);
             padding: 0.1em;
-            margin-bottom: 1.875em;
+            margin-bottom: 6%;
+
             ul {
                 list-style: none;
                 margin-bottom: 10px;
@@ -147,6 +148,13 @@ header {
         }
     }
 }
+
+#nextSlide {
+        bottom: -29%;
+    }
+#previousSlide {
+        bottom: -29%;
+    }
 
 main {
     section {
@@ -235,7 +243,7 @@ main {
             display: none; // Initially hidden
             max-height: 400px; // Set a max height for the cart
             width: 400px; // Enable vertical scrolling
-            overflow-y: auto; 
+            overflow-y: auto;
 
             #shopTitle {
                 font-size: 24px;
@@ -334,11 +342,13 @@ main {
     main section .gameContainer {
         flex-basis: calc(100% / 10);
     }
+
     #previousSlide {
-        bottom: 10%;
+        bottom: -22%;
     }
+
     #nextSlide {
-        bottom: 10%;
+        bottom: -22%;
     }
 }
 
@@ -347,9 +357,11 @@ main {
     main section .gameContainer {
         flex-basis: calc(100% / 10);
     }
+
     #previousSlide {
         bottom: 10%;
     }
+
     #nextSlide {
         bottom: 10%;
     }
@@ -361,6 +373,7 @@ main {
         padding-right: 30px;
     }
 }
+
 @media (max-width: 1200px) {
     main section .gameContainer {
         padding-left: 10px;
@@ -370,12 +383,14 @@ main {
 
 @media (max-width: 603px) {
     #iconCart {
-        margin-top: 20px; 
+        margin-top: 20px;
     }
+
     #cart {
         margin-top: 43.5px;
         max-width: 300px;
     }
+
     #footer .containerFooter #pFooter {
         width: 65%;
     }
@@ -390,8 +405,8 @@ article {
     align-items: center;
     justify-content: center;
     min-height: 50vh;
-    margin-bottom: 55px;
-    margin-top: 55px;
+    margin-bottom: 9%;
+    margin-top: 10%;
 }
 
 .containerSlider {
@@ -433,6 +448,7 @@ article {
 .sliderWrapper .sliderButton#previousSlide {
     left: 30px;
     display: none;
+    margin-top: 20%;
 }
 
 .sliderWrapper .sliderButton#nextSlide {
@@ -581,7 +597,8 @@ aside {
     background-color: var(--1-color);
 }
 
-#numberColor {color: #bdbdff;
+#numberColor {
+    color: #bdbdff;
     background-color: var(--4-color);
 }
 
@@ -702,4 +719,15 @@ aside {
     text-align: center;
     outline: none;
 }
+
 // Dice end
+
+@media (min-width: 2000px) {
+    article {
+        margin-top: 16%;
+        margin-bottom: 12%;
+    }
+    section {
+        margin-top: 8%;
+    }
+}
