@@ -1,7 +1,5 @@
 /** 
  * GameLogs 2024
- * Paweł Szabunio
- * Uniwersytet WSB Merito
  */
 
 * {
@@ -126,22 +124,24 @@ header {
                 }
 
                 #icon {
-                    width: 20px;
+                    width: 30px;
                     margin-left: 2.1em;
                     margin-bottom: -5px;
 
                     &:hover {
                         cursor: pointer;
+                        filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
                     }
                 }
 
                 #iconCart {
-                    width: 20px;
+                    width: 30px;
                     margin-left: 1em;
                     margin-bottom: -5px;
 
                     &:hover {
                         cursor: pointer;
+                        filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
                     }
                 }
             }
@@ -150,11 +150,12 @@ header {
 }
 
 #nextSlide {
-        bottom: -29%;
-    }
+    bottom: -29%;
+}
+
 #previousSlide {
-        bottom: -29%;
-    }
+    bottom: -29%;
+}
 
 main {
     section {
@@ -727,6 +728,7 @@ aside {
         margin-top: 16%;
         margin-bottom: 12%;
     }
+
     section {
         margin-top: 8%;
     }

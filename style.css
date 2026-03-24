@@ -1,8 +1,6 @@
 @charset "UTF-8";
 /** 
  * GameLogs 2024
- * Paweł Szabunio
- * Uniwersytet WSB Merito
  */
 * {
   font-family: "Lato", sans-serif;
@@ -119,20 +117,22 @@ header .navbar nav ul li {
   display: inline-block;
 }
 header .navbar nav ul #icon {
-  width: 20px;
+  width: 30px;
   margin-left: 2.1em;
   margin-bottom: -5px;
 }
 header .navbar nav ul #icon:hover {
   cursor: pointer;
+  filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
 }
 header .navbar nav ul #iconCart {
-  width: 20px;
+  width: 30px;
   margin-left: 1em;
   margin-bottom: -5px;
 }
 header .navbar nav ul #iconCart:hover {
   cursor: pointer;
+  filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
 }
 
 #nextSlide {
