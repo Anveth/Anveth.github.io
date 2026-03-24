@@ -733,3 +733,35 @@ aside {
         margin-top: 8%;
     }
 }
+
+ul.secondaryUL {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.secondaryUL a {
+    text-decoration: none;
+    color: var(--5-color);
+}
+
+ul.secondaryUL li {
+    padding: 0.5em 1em;
+    border-radius: 10px;
+    background-color: var(--3-color);
+    box-shadow: 0.2em 0.2em var(--4-color);
+    transition: all 0.3s ease;
+}
+
+ul.secondaryUL li:hover {
+    cursor: pointer;
+    color: #bdbdff;
+    box-shadow: 0.15em 0.15em #bdbdff;
+}
+
+#iconCart {
+    display: none;
+}
