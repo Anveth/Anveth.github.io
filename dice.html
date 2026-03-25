@@ -36,7 +36,7 @@
                         <li class="mainUl">Contact</li>
                     </a>
                     <img src="svg/sun.png" id="icon">
-                    <img src="svg/dice.png" id="iconDice" onclick="randomN()">
+                    <img src="svg/dice.png" id="iconDice" onclick="handleDiceRoll()">
                 </ul>
             </nav>
         </div>
@@ -150,7 +150,7 @@
             <span id="diceAnimation"></span>
         </div>
         <div id="diceInputWrapper">
-            <input id="maxNum" type="text" autocomplete="off" autofocus placeholder="----">
+            <input id="maxNum" type="text" autocomplete="off" placeholder="----">
         </div>
         <div id="diceButtonWrapper">
             <button id="diceButton" onclick="randomN()">

@@ -177,6 +177,13 @@ function topFunction() {
     });
 }
 
+// Random number generator set with default value 8
+function randomN() {
+    const maxNumber = document.getElementById("maxNum").value || 8;
+    const randomNumber = Math.floor(Math.random() * maxNumber) + 1;
+
+    document.getElementById("rng").innerHTML = randomNumber;
+}
 
 // Scroll bottom
 function bottomFunction() {
@@ -186,15 +193,14 @@ function bottomFunction() {
     });
 }
 
+// 3. The Orchestrator Function
+async function handleDiceRoll() {
+    bottomFunction();
 
-// Random number generator set with default value 8
-function randomN() {
-    const maxNumber = document.getElementById("maxNum").value || 8;
-    const randomNumber = Math.floor(Math.random() * maxNumber) + 1;
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    document.getElementById("rng").innerHTML = randomNumber;
+    randomN();
 }
-
 
 // Open images in new window functions
 function imageOpen1() {
