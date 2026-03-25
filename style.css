@@ -343,6 +343,9 @@ main section #cart #checkoutButton:hover {
   #iconCart {
     margin-top: 20px;
   }
+  #iconDice {
+    margin-top: 20px;
+  }
   #cart {
     margin-top: 43.5px;
     max-width: 300px;
