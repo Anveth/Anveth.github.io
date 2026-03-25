@@ -134,6 +134,15 @@ header .navbar nav ul #iconCart:hover {
   cursor: pointer;
   filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
 }
+header .navbar nav ul #iconDice {
+  width: 30px;
+  margin-left: 1em;
+  margin-bottom: -5px;
+}
+header .navbar nav ul #iconDice:hover {
+  cursor: pointer;
+  filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
+}
 
 #nextSlide {
   bottom: -29%;

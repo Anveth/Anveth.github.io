@@ -144,6 +144,16 @@ header {
                         filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
                     }
                 }
+                #iconDice {
+                    width: 30px;
+                    margin-left: 1em;
+                    margin-bottom: -5px;
+
+                    &:hover {
+                        cursor: pointer;
+                        filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(100deg);
+                    }
+                }
             }
         }
     }
