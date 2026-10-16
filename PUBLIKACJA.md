@@ -107,14 +107,13 @@ W VS Code otwórz **Source Control** (`Ctrl+Shift+G`) i klikaj zmienione pliki,
 żeby obejrzeć różnice. W terminalu dodaj konkretne pliki aplikacji:
 
 ```sh
-git add README.md PUBLIKACJA.md index.html dice.html style.css script.js games.js storage.js package.json package-lock.json .gitignore .nojekyll .vscode/tasks.json scripts/dev.mjs images/cyberpunk-cover.jpg
-git add -u -- style.scss style.css.map
+git add README.md PUBLIKACJA.md KONTA.md index.html dice.html style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js package.json package-lock.json scripts images/optimized tests supabase
 git diff --cached --stat
-git commit -m "Replace game store with GameLogs V2 journal"
+git commit -m "Improve gallery and optimize images"
 ```
 
-Drugie polecenie zapisuje usunięcie nieużywanych plików Sass tylko z nowego
-projektu. Stary projekt nadal je ma. Nie dodawaj plików `.DS_Store`.
+Lista obejmuje kod kont, galerii i wygenerowane pliki WebP. Stary projekt
+pozostaje w swoim osobnym folderze. Nie dodawaj plików `.DS_Store` ani sekretów.
 Commit zapisuje zmiany lokalnie — sam jeszcze nie publikuje strony.
 
 ## 6. Pobierz aktualny stan GitHuba i wyślij nową wersję

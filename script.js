@@ -1,5 +1,5 @@
-import { setupGallery } from './gallery.js?v=20261016-5';
-import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, coverStore as localCoverStore, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261016-4';
+import { setupGallery } from './gallery.js?v=20261016-7';
+import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261016-7';
 import { createCloudStore } from './cloud.js?v=20261016-6';
 import { mountAccount } from './account.js?v=20261016-6';
 import { SUPABASE_CONFIG } from './config.js?v=20261016-6';
@@ -94,9 +94,9 @@ async function hydrateCovers() {
     }));
 }
 
-function gameCover(game, className = 'game-cover') {
+function gameCover(game, className = 'game-cover', eager = false) {
     const image = coverUrls.get(game.imageKey) || safeImage(game.image);
-    return `<div class="${className} cover-placeholder"><span aria-hidden="true">${escapeHtml(game.title.charAt(0).toUpperCase())}</span>${image ? `<img src="${escapeHtml(image)}" alt="Okładka gry ${escapeHtml(game.title)}" loading="lazy">` : ''}</div>`;
+    return `<div class="${className} cover-placeholder"><span aria-hidden="true">${escapeHtml(game.title.charAt(0).toUpperCase())}</span>${image ? `<img src="${escapeHtml(image)}" alt="Okładka gry ${escapeHtml(game.title)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async" width="600" height="900">` : ''}</div>`;
 }
 
 // Keep a useful placeholder if a linked image is unavailable.
@@ -111,8 +111,8 @@ function renderLibrary() {
     const count = games.length;
     const noun = count === 1 ? 'gra' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14) ? 'gry' : 'gier';
     byId('gameCount').textContent = `${count} ${noun}`;
-    grid.innerHTML = games.length ? games.map(game => `<article class="game-card">
-        <button class="cover-button" type="button" data-open-game="${escapeHtml(game.id)}" aria-label="Otwórz dziennik: ${escapeHtml(game.title)}">${gameCover(game)}</button>
+    grid.innerHTML = games.length ? games.map((game, index) => `<article class="game-card">
+        <button class="cover-button" type="button" data-open-game="${escapeHtml(game.id)}" aria-label="Otwórz dziennik: ${escapeHtml(game.title)}">${gameCover(game, 'game-cover', index < 4)}</button>
         <div class="game-card-content">
             <button class="game-title" type="button" data-open-game="${escapeHtml(game.id)}">${escapeHtml(game.title)}</button>
             <p class="game-meta">${escapeHtml(game.platform || 'Platforma nieznana')}${game.year ? ` · ${game.year}` : ''}</p>
@@ -238,9 +238,14 @@ function setupLibraryPage() {
         const file = event.target.files[0];
         if (!file) return;
         showError('gameFormError');
-        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 10 * 1024 * 1024) {
-            showError('gameFormError', 'Wybierz JPG, PNG lub WebP o rozmiarze do 10 MB.');
+        try { validateCoverFile(file); }
+        catch (error) {
+            showError('gameFormError', error.message);
             event.target.value = '';
+            stagedCover = null;
+            revokePreview();
+            const existing = library.find(game => game.id === editingId);
+            updatePreview(existing ? coverUrls.get(existing.imageKey) || safeImage(existing.image) : '');
             return;
         }
         stagedCover = file;
@@ -288,6 +293,7 @@ async function saveGame(event) {
         let imageKey = existing?.imageKey || '';
         let image = existing?.image || '';
         if (stagedCover instanceof File) {
+            byId('saveGame').textContent = 'Kompresowanie okładki…';
             const blob = await prepareCover(stagedCover);
             assertScope(epoch);
             imageKey = crypto.randomUUID();
@@ -299,6 +305,7 @@ async function saveGame(event) {
             image = safeImage(fields.get('image').trim());
         }
         const game = normalizeGame({ id, title, platform: fields.get('platform').trim(), year: fields.get('year'), status: fields.get('status'), rating: fields.get('rating'), image, imageKey, notes: existing?.notes || [] });
+        byId('saveGame').textContent = 'Zapisywanie…';
         await commitLibrary(existing ? library.map(item => item.id === id ? game : item) : [game, ...library], epoch);
         byId('gameDialog').close();
         if (!existing) document.querySelector('[data-filter="all"]').click();
@@ -307,7 +314,7 @@ async function saveGame(event) {
         if (existing) openDetails(id);
         else notify(`Dodano „${title}”. Otwórz dziennik gry, aby zapisać pierwszą sesję.`);
     } catch (error) { showError('gameFormError', error.message); }
-    finally { byId('saveGame').disabled = false; }
+    finally { byId('saveGame').disabled = false; byId('saveGame').textContent = 'Zapisz w bibliotece'; }
 }
 
 function setupBackup() {

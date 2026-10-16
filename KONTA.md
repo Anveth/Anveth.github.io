@@ -91,7 +91,7 @@ npm ci
 npm run check
 npm test
 git status
-git add index.html dice.html style.css script.js storage.js gallery.js account.js cloud.js config.js scripts/dev.mjs package.json package-lock.json README.md PUBLIKACJA.md KONTA.md tests supabase
+git add index.html dice.html style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js scripts/dev.mjs scripts/optimize-images.mjs images/optimized package.json package-lock.json README.md PUBLIKACJA.md KONTA.md tests supabase
 git diff --cached --stat
 git commit -m "Add private game libraries with Supabase Auth and restore gallery"
 git pull --rebase origin main
@@ -113,6 +113,9 @@ ani zmiany adresu strony; backend działa osobno w Supabase.
 - Nie zmieniaj bucketa `game-covers` na publiczny. Okładki są pobierane po zalogowaniu.
 - Obrazy z zewnętrznego URL są publicznymi zasobami zewnętrznego serwera;
   prywatny magazyn dotyczy plików wgranych przez formularz.
+- Nowe pliki z dysku: maks. 10 MB i 40 megapikseli. Przeglądarka automatycznie
+  tworzy WebP do 1200 px, docelowo do 300 KB, maksymalnie 512 KB po kompresji.
+  Starsze wgrane pliki nie są masowo przepisywane ani usuwane z kont.
 - Przy konflikcie dwóch urządzeń zapis jest odrzucany zamiast nadpisywać
   nowszą wersję. Wybierz **Moje konto → Odśwież bibliotekę** i ponów zmianę.
 - Nie ma jeszcze edycji offline z późniejszą synchronizacją. Błąd sieci oznacza

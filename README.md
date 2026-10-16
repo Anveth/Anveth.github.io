@@ -35,7 +35,7 @@ GameLogs V2: uruchom podgląd**.
 Jeśli serwer już działa, kolejne `npm run dev` wyświetli działający adres.
 Nie zmieniamy automatycznie portu, aby zachować jeden magazyn danych.
 
-Wymagany jest Node.js 18 lub nowszy. Podgląd nie wymaga `npm install`.
+Wymagany jest Node.js 20.9 lub nowszy (zalecany aktualny LTS). Podgląd nie wymaga `npm install`.
 `npm run check` sprawdza składnię JavaScript. Testy bazy wymagają jednorazowego
 `npm ci`, a następnie `npm test` (PostgreSQL w pamięci, bez zmian w produkcji).
 
@@ -56,6 +56,8 @@ npm run dev
 - `games.js` — początkowa kolekcja gier.
 - `storage.js` — zapis danych i okładek, odczyt oraz migracja starszej kolekcji.
 - `gallery.js` — slider: strzałki, przeciąganie, pasek oraz klawiatura.
+- `image-assets.js` — wygenerowana mapa lżejszych grafik, również dla starszych zapisów biblioteki.
+- `scripts/optimize-images.mjs` — konwersja oryginalnych grafik na WebP i warianty responsywne.
 - `account.js`, `cloud.js`, `config.js` — konta i połączenie z Supabase.
 - `supabase/schema.sql` — tabele, atomowy zapis, RLS i prywatne okładki.
 - `images/` — okładki oraz kadry z gier.
@@ -70,7 +72,8 @@ Przed testem kont ustaw adresy powrotu i zapoznaj się z ograniczeniem SMTP w KO
 
 W trybie bez konta dane zapisują się w `localStorage`, a wgrane okładki w `IndexedDB`
 konkretnej przeglądarki i adresu. JPG, PNG i WebP do 10 MB są pomniejszane
-do maksymalnie 1200 px i zapisywane jako WebP. W trybie lokalnym nie trafiają
+do maksymalnie 1200 px i zapisywane jako WebP (zwykle do 300 KB, twardy limit
+512 KB po kompresji; maks. 40 megapikseli na wejściu). W trybie lokalnym nie trafiają
 na serwer; po zalogowaniu są w prywatnym magazynie Supabase.
 Używaj konsekwentnie `http://localhost:5173`; inny port, `127.0.0.1`
 lub adres publiczny oznaczają osobny magazyn danych. Wyczyszczenie danych
@@ -80,6 +83,38 @@ Użyj Eksportuj, a na nowym adresie Importuj, aby przenieść kolekcję,
 okładki i wpisy. Przed zastąpieniem biblioteki importem wyeksportuj obecną.
 
 Okładka Cyberpunk 2077 pochodzi z [zasobów Steam](https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900_2x.jpg).
+
+## Lżejsze grafiki i większa galeria
+
+Na komputerze galeria pokazuje dwa kadry 16:9, na telefonie jeden i fragment
+następnego. Kliknięcie otwiera powiększenie na stronie; działają strzałki,
+klawiatura, Esc oraz kliknięcie poza oknem. Zdjęcie w powiększeniu nie jest
+przycinane. Przy wyłączonym JavaScript link prowadzi bezpośrednio do pliku WebP.
+
+33 wbudowane grafiki (15 okładek i 18 kadrów) mają zoptymalizowane wersje
+w `images/optimized/`. Oryginały są zachowane. Galeria ma warianty szerokości
+do 640, 1280 i 1920 px, bez powiększania mniejszych oryginałów. `srcset` dobiera
+plik do ekranu, `loading="lazy"` odracza pobieranie galerii poniżej ekranu.
+Pierwsze cztery okładki mają `loading="eager"`; obrazy mają zarezerwowane proporcje,
+żeby ograniczyć skakanie układu. Zewnętrznych linków do obrazów nie konwertujemy.
+
+Po zmianie oryginałów uruchom:
+
+```sh
+npm ci
+npm run images:optimize
+npm run check
+npm test
+```
+
+Generator odczytuje źródła okładek z `games.js`, a galerii z `data-original`
+w HTML. Aktualizuje warianty WebP, mapę `image-assets.js` i atrybuty obrazków
+w galerii. Wygenerowane pliki trzeba dodać do commita razem z kodem.
+Stare zapisane lokalnie i na koncie odwołania do wbudowanych okładek są
+przekierowane na lżejsze pliki przy odczycie, bez usuwania notatek czy ocen.
+The Walking Dead usunięto z domyślnej kolekcji. Z wcześniejszej lokalnej kopii
+znika tylko niezmieniony kafelek demonstracyjny bez wpisów; własne wpisy,
+zmienione metadane i biblioteki kont nie są automatycznie usuwane.
 
 ## GitHub — połączenie jest już ustawione
 
@@ -100,9 +135,9 @@ Najpierw obejrzyj różnice w Source Control w VS Code lub przez `git diff`.
 W terminalu projektu:
 
 ```sh
-git add README.md PUBLIKACJA.md index.html dice.html style.css script.js games.js storage.js package.json package-lock.json .gitignore .nojekyll .vscode/tasks.json scripts/dev.mjs images/cyberpunk-cover.jpg
-git add -u -- style.scss style.css.map
-git commit -m "Replace game store with GameLogs V2 library"
+git add README.md PUBLIKACJA.md KONTA.md index.html dice.html style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js package.json package-lock.json scripts images/optimized tests supabase
+git diff --cached --stat
+git commit -m "Improve gallery and optimize images"
 git pull --rebase origin main
 git push origin main
 ```

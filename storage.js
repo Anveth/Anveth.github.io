@@ -1,4 +1,5 @@
-import { DEFAULT_GAMES } from './games.js?v=20261016-3';
+import { DEFAULT_GAMES } from './games.js?v=20261016-7';
+import { IMAGE_ASSETS } from './image-assets.js?v=20261016-7';
 
 export const STATUSES = { backlog: 'Backlog', playing: 'Gram', completed: 'Ukończone' };
 const LIBRARY_KEY = 'gamelogs:library';
@@ -8,7 +9,7 @@ export function safeImage(value = '') {
     if (typeof value !== 'string' || !value) return '';
     try {
         const url = new URL(value, window.location.href);
-        return ['https:', 'http:'].includes(url.protocol) ? value : '';
+        return ['https:', 'http:'].includes(url.protocol) ? IMAGE_ASSETS[value]?.src || value : '';
     } catch { return ''; }
 }
 
@@ -26,9 +27,10 @@ export function normalizeGame(value) {
             createdAt: typeof note.createdAt === 'string' ? note.createdAt : new Date().toISOString()
         };
     });
-    let image = safeImage(value.image);
+    let image = value.image;
     // Migrate only the shipped Cyberpunk image; keep a user's custom cover.
     if (value.id === 'cyberpunk' && /(?:^|\/)images\/cyberpunk\.jpg$/.test(image)) image = 'images/cyberpunk-cover.jpg';
+    image = safeImage(image);
     return {
         id: value.id.slice(0, 100), title: value.title.trim().slice(0, 80),
         platform: typeof value.platform === 'string' ? value.platform.slice(0, 30) : '',
@@ -49,7 +51,11 @@ export function loadLibrary() {
     if (raw === null) return DEFAULT_GAMES.map(normalizeGame);
     const saved = JSON.parse(raw);
     if (!Array.isArray(saved)) throw new Error('Nie udało się odczytać zapisanej biblioteki.');
-    return saved.map(normalizeGame);
+    // Retire only the untouched demo tile, never a user's journal or cloud library.
+    return saved.map(normalizeGame).filter(game => !(game.id === 'walking-dead'
+        && game.title === 'The Walking Dead' && game.platform === 'PC' && game.year === 2012
+        && game.status === 'completed' && game.rating === 8 && game.notes.length === 0
+        && !game.imageKey && ['images/twd.jpg', 'images/optimized/covers/twd-640.webp'].includes(game.image)));
 }
 
 export function saveLibrary(games) {
@@ -78,21 +84,37 @@ export async function coverStore(action, key, blob) {
     });
 }
 
-export async function prepareCover(file) {
+export function validateCoverFile(file) {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Wybierz obraz JPG, PNG lub WebP.');
-    if (file.size > 10 * 1024 * 1024) throw new Error('Obraz jest za duży. Limit wynosi 10 MB.');
+    if (!file.size) throw new Error('Wybrany plik jest pusty. Wybierz inny obraz.');
+    if (file.size > 10 * 1024 * 1024) throw new Error('Plik przekracza 10 MB i nie zostanie dodany. Wybierz mniejszy obraz — dopuszczalny plik pomniejszymy automatycznie.');
+}
+
+export async function prepareCover(file) {
+    validateCoverFile(file);
     const url = URL.createObjectURL(file);
     try {
         const image = new Image();
         image.src = url;
-        await image.decode();
+        try { await image.decode(); }
+        catch { throw new Error('Nie można odczytać tego obrazu. Wybierz inny plik JPG, PNG lub WebP.'); }
+        if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth * image.naturalHeight > 40000000) throw new Error('Obraz ma zbyt dużą rozdzielczość. Wybierz zdjęcie do 40 megapikseli.');
         const scale = Math.min(1, 1200 / Math.max(image.naturalWidth, image.naturalHeight));
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
         canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-        canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-        return await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Nie udało się przygotować obrazu.')), 'image/webp', 0.9));
-    } catch { throw new Error('Nie można odczytać tego obrazu. Wybierz inny plik JPG, PNG lub WebP.'); }
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Przeglądarka nie pozwala przygotować okładki. Spróbuj w nowszej przeglądarce.');
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        let result;
+        for (const quality of [.84, .76, .68, .6]) {
+            result = await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Nie udało się przygotować obrazu.')), 'image/webp', quality));
+            if (result.type !== 'image/webp') throw new Error('Ta przeglądarka nie obsługuje zapisu WebP. Zaktualizuj ją lub wybierz inną.');
+            if (result.size <= 300 * 1024) break;
+        }
+        if (result.size > 512 * 1024) throw new Error('Nawet po kompresji okładka przekracza 512 KB. Wybierz mniej szczegółowy lub mniejszy obraz.');
+        return result;
+    }
     finally { URL.revokeObjectURL(url); }
 }
 

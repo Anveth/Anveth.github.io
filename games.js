@@ -12,7 +12,6 @@ export const DEFAULT_GAMES = [
     { id: "ghost", title: "Ghost of Tsushima", platform: "PS5", year: 2021, status: "completed", rating: 9, image: "images/ghostOfTsushima.jpg" },
     { id: "life-is-strange", title: "Life is Strange", platform: "PC", year: 2015, status: "completed", rating: 9, image: "images/lifeIsStrange.jpg" },
     { id: "fallout", title: "Fallout 4", platform: "PC", year: 2015, status: "backlog", rating: null, image: "images/fallout4.jpg" },
-    { id: "walking-dead", title: "The Walking Dead", platform: "PC", year: 2012, status: "completed", rating: 8, image: "images/twd.jpg" },
     { id: "dying-light", title: "Dying Light 2", platform: "PC", year: 2022, status: "backlog", rating: null, image: "images/dl2.jpeg" },
     { id: "elden-ring", title: "Elden Ring", platform: "PC", year: 2022, status: "backlog", rating: null, image: "images/eldenRing.png" }
 ];

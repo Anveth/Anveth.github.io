@@ -35,7 +35,7 @@ const server = createServer(async (request, response) => {
         const relative = pathname === '/' ? 'index.html' : pathname.slice(1);
         const path = resolve(root, relative);
         const extension = extname(path).toLowerCase();
-        const isPublic = ['index.html', 'dice.html', 'style.css', 'script.js', 'games.js', 'storage.js', 'account.js', 'gallery.js', 'cloud.js', 'config.js', 'favicon.ico'].includes(relative)
+        const isPublic = ['index.html', 'dice.html', 'style.css', 'script.js', 'games.js', 'storage.js', 'image-assets.js', 'account.js', 'gallery.js', 'cloud.js', 'config.js', 'favicon.ico'].includes(relative)
             || relative.startsWith('images/') || relative.startsWith('svg/');
 
         if (!isPublic || !path.startsWith(root + sep) || relative.split('/').some(part => part.startsWith('.')) || !types[extension]) {

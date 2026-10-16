@@ -7,13 +7,15 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "start": "node scripts/dev.mjs",
-    "check": "node --check script.js && node --check storage.js && node --check games.js && node --check gallery.js && node --check account.js && node --check cloud.js && node --check config.js && node --check scripts/dev.mjs",
+    "images:optimize": "node scripts/optimize-images.mjs",
+    "check": "node --check script.js && node --check storage.js && node --check games.js && node --check gallery.js && node --check image-assets.js && node --check account.js && node --check cloud.js && node --check config.js && node --check scripts/dev.mjs && node --check scripts/optimize-images.mjs",
     "test": "node --test tests/*.test.mjs"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.9.0"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.10"
+    "@electric-sql/pglite": "^0.5.10",
+    "sharp": "0.35.5"
   }
 }
