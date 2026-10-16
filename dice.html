@@ -1,164 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <meta name="description" content="GameLogs — wylosuj następną grę z biblioteki.">
+    <title>GameLogs — losuj grę</title>
+    <link rel="stylesheet" href="style.css?v=20261016-3">
+    <link rel="icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
-    <script defer src="script.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    <script type="module" src="script.js?v=20261016-3"></script>
 </head>
-
-<body>
-
-    <header>
-        <div class="navbar">
-            <nav>
-                <ul class="mainUL">
-                    <a href="index.html">
-                        <li class="gameLogs">GameLogs</li>
-                    </a>
-                    <a href="index.html#article">
-                        <li class="mainUl">Screens</li>
-                    </a>
-                    <a href="dice.html">
-                        <li class="mainUl">Random Game</li>
-                    </a>
-                    <a href="index.html#footer">
-                        <li class="mainUl">Contact</li>
-                    </a>
-                    <img src="svg/sun.png" id="icon">
-                    <img src="svg/dice.png" id="iconDice" onclick="handleDiceRoll()">
-                </ul>
+<body data-page="dice">
+    <header class="site-header">
+        <div class="nav-shell">
+            <a class="brand" href="index.html" aria-label="GameLogs — strona główna">game<span>logs</span></a>
+            <nav class="primary-nav" aria-label="Główna nawigacja">
+                <a href="index.html#biblioteka">Biblioteka</a>
+                <a href="index.html#dziennik">Dziennik</a>
+                <a class="is-active" href="dice.html">Losuj grę</a>
             </nav>
+            <button class="icon-button" id="themeToggle" type="button" aria-label="Włącz jasny motyw" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button>
         </div>
     </header>
-
-    <main>
-        <section>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/god-of-war-ragnarok/" target="_blank">
-                        <img class="gamePhotos" src="images/GoWR.png" alt="Gra 1" data-name="God of War Ragnarok">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 1 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/dishonored/" target="_blank">
-                        <img class="gamePhotos" src="images/Dishonored.jpg" alt="Gra 2">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 2 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/fable-the-lost-chapters/" target="_blank">
-                        <img class="gamePhotos" src="images/Fable.png" alt="Gra 3">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 3 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/the-elder-scrolls-v-skyrim/" target="_blank">
-                        <img class="gamePhotos" src="images/Skyrim.jpg" alt="Gra 4">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 4 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/dark-souls-iii/" target="_blank">
-                        <img class="gamePhotos" src="images/darkSouls3.png" alt="Gra 5">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 5 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/sekiro-shadows-die-twice/" target="_blank">
-                        <img class="gamePhotos" src="images/sekiro.jpg" alt="Gra 6">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 6 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/the-witcher-3:-wild-hunt/" target="_blank">
-                        <img class="gamePhotos" src="images/Witcher3.jpg" alt="Gra 7">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 7 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </div>
-            <div class="gameContainer">
-                <div class="game">
-                    <a href="https://www.metacritic.com/game/hogwarts-legacy/" target="_blank">
-                        <img class="gamePhotos" src="images/Hogwarts.png" alt="Gra 8">
-                    </a>
-                    <div class="containerPriceTitle">
-                        <div class="priceHolder" id="diceHolder">
-                            <p id="pPrice"><span id="numberColor">( 8 )</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <main class="dice-page page-width">
+        <section class="dice-intro" aria-labelledby="diceTitle">
+            <p class="eyebrow">Decyzja na dziś</p>
+            <h1 id="diceTitle">Nie wiesz, w co zagrać?</h1>
+            <p>Kość wylosuje jedną grę z Twojej lokalnej biblioteki. Wybierz źródło i daj się zaskoczyć.</p>
+        </section>
+        <section class="dice-panel" aria-label="Generator losowej gry">
+            <div class="dice-face" id="diceFace" aria-hidden="true">⚄</div>
+            <label class="dice-source">Losuj z
+                <select id="diceSource">
+                    <option value="backlog">backlogu</option>
+                    <option value="all">całej biblioteki</option>
+                    <option value="playing">gier, w które gram</option>
+                </select>
+            </label>
+            <button class="button button-primary dice-button" id="rollButton" type="button">Rzuć kością</button>
+            <p class="dice-message" id="diceMessage" aria-live="polite">Wybierz źródło i wylosuj następną historię.</p>
+            <article class="random-result" id="randomResult" hidden></article>
         </section>
     </main>
-
-    <!-- Dice animation and numbers when generated -->
-    <div id="diceWrapper">
-        <div id="rng">
-            <span id="diceAnimation"></span>
-        </div>
-        <div id="diceInputWrapper">
-            <input id="maxNum" type="text" autocomplete="off" placeholder="----">
-        </div>
-        <div id="diceButtonWrapper">
-            <button id="diceButton" onclick="randomN()">
-                <div id="text">Generate</div>
-            </button>
-        </div>
-    </div>
-
+    <footer class="site-footer"><p>GameLogs <span>·</span> lokalny dziennik gier</p></footer>
 </body>
-
 </html>

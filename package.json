@@ -1,5 +1,15 @@
 {
-  "devDependencies": {
-    "node-sass": "^9.0.0"
+  "name": "gamelogs-v2",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Osobisty katalog i dziennik gier",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "start": "node scripts/dev.mjs",
+    "check": "node --check script.js && node --check storage.js && node --check games.js && node --check scripts/dev.mjs"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
