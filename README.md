@@ -7,6 +7,8 @@ motyw i losowanie gry z biblioteki. Eksport/import przenosi także własne okła
 
 **Pełny poradnik publikacji i podmiany starej strony: [PUBLIKACJA.md](PUBLIKACJA.md).**
 
+**Konta, prywatny zapis w Supabase i konfiguracja e-mail: [KONTA.md](KONTA.md).**
+
 ## Dwa oddzielne projekty
 
 - `../Anveth.github.io` — lokalne archiwum starego sklepu, przywrócone z commita `87a88a8`.
@@ -33,8 +35,9 @@ GameLogs V2: uruchom podgląd**.
 Jeśli serwer już działa, kolejne `npm run dev` wyświetli działający adres.
 Nie zmieniamy automatycznie portu, aby zachować jeden magazyn danych.
 
-Wymagany jest Node.js 18 lub nowszy. Projekt nie ma zależności do instalowania;
-`npm install` nie jest potrzebne. `npm run check` sprawdza składnię JavaScript.
+Wymagany jest Node.js 18 lub nowszy. Podgląd nie wymaga `npm install`.
+`npm run check` sprawdza składnię JavaScript. Testy bazy wymagają jednorazowego
+`npm ci`, a następnie `npm test` (PostgreSQL w pamięci, bez zmian w produkcji).
 
 Na macOS możesz otworzyć projekt z terminala:
 
@@ -52,17 +55,23 @@ npm run dev
 - `script.js` — interfejs katalogu, dzienniki, filtry, oceny, eksport/import i losowanie.
 - `games.js` — początkowa kolekcja gier.
 - `storage.js` — zapis danych i okładek, odczyt oraz migracja starszej kolekcji.
+- `gallery.js` — slider: strzałki, przeciąganie, pasek oraz klawiatura.
+- `account.js`, `cloud.js`, `config.js` — konta i połączenie z Supabase.
+- `supabase/schema.sql` — tabele, atomowy zapis, RLS i prywatne okładki.
 - `images/` — okładki oraz kadry z gier.
 - `scripts/dev.mjs` — lokalny serwer podglądu (nie jest backendem aplikacji).
 
 Statusy i oceny początkowych gier to przykładowe dane. Dzienniki są początkowo
 puste; kliknij okładkę lub Dziennik, aby dodać sesję. Przycisk Edytuj grę
 pozwala zmienić tytuł, status, ocenę i okładkę bez utraty notatek.
-Obecna wersja nie ma kont ani bazy na serwerze.
+Po zalogowaniu biblioteka konta zapisuje się w Supabase. Nowe konto jest puste;
+lokalną kolekcję przenosisz jawnie przyciskiem w panelu **Moje konto**.
+Przed testem kont ustaw adresy powrotu i zapoznaj się z ograniczeniem SMTP w KONTA.md.
 
-Dane zapisują się w `localStorage`, a wgrane okładki w `IndexedDB`
+W trybie bez konta dane zapisują się w `localStorage`, a wgrane okładki w `IndexedDB`
 konkretnej przeglądarki i adresu. JPG, PNG i WebP do 10 MB są pomniejszane
-do maksymalnie 1200 px i zapisywane lokalnie jako WebP. Nie trafiają na serwer.
+do maksymalnie 1200 px i zapisywane jako WebP. W trybie lokalnym nie trafiają
+na serwer; po zalogowaniu są w prywatnym magazynie Supabase.
 Używaj konsekwentnie `http://localhost:5173`; inny port, `127.0.0.1`
 lub adres publiczny oznaczają osobny magazyn danych. Wyczyszczenie danych
 witryny usuwa zapisaną bibliotekę. Pliki HTML/CSS/JS nie zawierają Twoich

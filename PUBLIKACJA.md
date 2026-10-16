@@ -1,5 +1,9 @@
 # GameLogs V2 — od lokalnego podglądu do zastąpienia starej strony
 
+**Aktualizacja: dodano konta Supabase. Przed publikacją kont wykonaj kroki
+z [KONTA.md](KONTA.md), w szczególności URL Configuration i test rejestracji.
+Znajdziesz tam aktualną listę plików do `git add`, obejmującą konta i galerię.**
+
 ## Co jest czym
 
 Na komputerze masz dwa oddzielne foldery:
@@ -30,7 +34,7 @@ npm run dev
 
 Wejdź na **http://localhost:5173**. Zapisuj pliki przez `Cmd+S`,
 odświeżaj przez `Cmd+R`; serwer zatrzymasz przez `Ctrl+C` w jego terminalu.
-Nie trzeba uruchamiać `npm install` — nie ma zależności zewnętrznych.
+Sam podgląd nie wymaga `npm install`. Do testów bazy użyj `npm ci` i `npm test`.
 
 Jeśli widzisz **„GameLogs V2 już działa”**, to dobra wiadomość: jeden podgląd
 jest już uruchomiony. Otwórz wskazany adres, zamiast uruchamiać drugi proces.
@@ -164,7 +168,8 @@ Nie przesyłaj folderu `gamelogsV2` jako dodatkowego katalogu wewnątrz repo.
 Import zastępuje bibliotekę w tej konkretnej przeglądarce. W razie posiadania
 innych wpisów na publicznym adresie najpierw je wyeksportuj. Import nie
 publikuje notatek w repozytorium. Każdy odwiedzający nadal ma swoją lokalną
-bibliotekę, dopóki nie dodamy kont i backendu.
+bibliotekę w trybie bez logowania. Po zalogowaniu ma oddzielną bibliotekę
+na swoim koncie Supabase; lokalną kolekcję można przenieść przez **Moje konto**.
 
 ## 9. Kolejne aktualizacje
 

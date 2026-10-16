@@ -7,9 +7,13 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "start": "node scripts/dev.mjs",
-    "check": "node --check script.js && node --check storage.js && node --check games.js && node --check scripts/dev.mjs"
+    "check": "node --check script.js && node --check storage.js && node --check games.js && node --check gallery.js && node --check account.js && node --check cloud.js && node --check config.js && node --check scripts/dev.mjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10"
   }
 }

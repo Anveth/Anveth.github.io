@@ -1,4 +1,8 @@
-import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, coverStore, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261016-3';
+import { setupGallery } from './gallery.js?v=20261016-5';
+import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, coverStore as localCoverStore, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261016-4';
+import { createCloudStore } from './cloud.js?v=20261016-6';
+import { mountAccount } from './account.js?v=20261016-6';
+import { SUPABASE_CONFIG } from './config.js?v=20261016-6';
 
 let library = [];
 let readError = '';
@@ -9,6 +13,10 @@ let editingId = null;
 let stagedCover = null;
 let previewUrl = '';
 let pendingImport = null;
+let cloudStore = null;
+let scopeEpoch = 0;
+let writePending = false;
+let identityPending = Boolean(SUPABASE_CONFIG.url || SUPABASE_CONFIG.publishableKey);
 const coverUrls = new Map();
 const byId = id => document.getElementById(id);
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
@@ -30,10 +38,32 @@ function showError(id, message = '') {
     element.hidden = !message;
 }
 
-function commitLibrary(next) {
-    if (readError) throw new Error('Najpierw przywróć poprawną kopię biblioteki przez Importuj. Obecne dane nie zostały nadpisane.');
-    saveLibrary(next);
-    library = next;
+function assertScope(epoch) {
+    if (epoch !== scopeEpoch) throw new Error('Konto zmieniło się w trakcie operacji. Ponów ją na właściwym koncie.');
+}
+
+async function commitLibrary(next, expectedEpoch = scopeEpoch) {
+    assertScope(expectedEpoch);
+    if (readError) throw new Error(cloudStore ? 'Najpierw odśwież bibliotekę w panelu konta. Zmiany nie zostały zapisane.' : 'Najpierw przywróć poprawną kopię biblioteki przez Importuj. Obecne dane nie zostały nadpisane.');
+    if (writePending || identityPending) throw new Error('Poczekaj na zakończenie bieżącego zapisu lub wczytania konta.');
+    const epoch = scopeEpoch;
+    const store = cloudStore;
+    writePending = true;
+    try {
+        if (store) await store.save(next);
+        else saveLibrary(next);
+        if (scopeEpoch !== epoch) throw new Error('Konto zmieniło się w trakcie zapisu. Odśwież bibliotekę.');
+        library = next;
+    } finally { writePending = false; }
+}
+
+async function coverStore(action, key, blob, epoch = scopeEpoch) {
+    assertScope(epoch);
+    if (identityPending) return Promise.reject(new Error('Poczekaj na wczytanie biblioteki konta.'));
+    const store = cloudStore;
+    const result = await (store ? store.cover(action, key, blob) : localCoverStore(action, key, blob));
+    assertScope(epoch);
+    return result;
 }
 
 function setupTheme() {
@@ -55,11 +85,12 @@ function setupTheme() {
 }
 
 async function hydrateCovers() {
+    const epoch = scopeEpoch;
     await Promise.all(library.filter(game => game.imageKey && !coverUrls.has(game.imageKey)).map(async game => {
         try {
-            const blob = await coverStore('get', game.imageKey);
-            if (blob) coverUrls.set(game.imageKey, URL.createObjectURL(blob));
-        } catch { notify('Nie udało się wczytać lokalnej okładki. Możesz wybrać ją ponownie w edycji gry.', true); }
+            const blob = await coverStore('get', game.imageKey, undefined, epoch);
+            if (blob && epoch === scopeEpoch && !coverUrls.has(game.imageKey)) coverUrls.set(game.imageKey, URL.createObjectURL(blob));
+        } catch { if (epoch === scopeEpoch) notify('Nie udało się wczytać okładki. Sprawdź połączenie lub wybierz ją ponownie w edycji gry.', true); }
     }));
 }
 
@@ -170,7 +201,7 @@ function setupLibraryPage() {
         const button = event.target.closest('[data-open-game]');
         if (button) openDetails(button.dataset.openGame);
     });
-    byId('gameGrid').addEventListener('change', event => {
+    byId('gameGrid').addEventListener('change', async event => {
         const target = event.target;
         const id = target.dataset.statusId || target.dataset.ratingId;
         const game = library.find(item => item.id === id);
@@ -178,12 +209,12 @@ function setupLibraryPage() {
         if (!target.checkValidity()) { target.reportValidity(); return; }
         const updates = target.dataset.statusId ? { status: target.value } : { rating: target.value === '' ? null : Number(target.value) };
         try {
-            commitLibrary(library.map(item => item.id === id ? { ...item, ...updates } : item));
+            await commitLibrary(library.map(item => item.id === id ? { ...item, ...updates } : item));
             renderLibrary();
             renderRecentNotes();
             const next = [...byId('gameGrid').querySelectorAll('select, input')].find(element => element.dataset.statusId === id && target.dataset.statusId || element.dataset.ratingId === id && target.dataset.ratingId);
             next?.focus({ preventScroll: true });
-        } catch (error) { notify(error.message, true); }
+        } catch (error) { renderLibrary(); notify(error.message, true); }
     });
     document.querySelectorAll('[data-open-dialog]').forEach(button => button.addEventListener('click', () => openGameForm()));
     document.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => byId('gameDialog').close()));
@@ -219,7 +250,7 @@ function setupLibraryPage() {
         updatePreview(previewUrl);
     });
     byId('gameForm').addEventListener('submit', saveGame);
-    byId('noteForm').addEventListener('submit', event => {
+    byId('noteForm').addEventListener('submit', async event => {
         event.preventDefault();
         const form = event.target;
         if (!form.reportValidity()) return;
@@ -229,7 +260,7 @@ function setupLibraryPage() {
         if (!text || !validDate(date)) { showError('noteFormError', 'Wpisz treść i poprawną datę sesji.'); return; }
         const note = { id: crypto.randomUUID(), text, date, minutes: fields.get('minutes') ? Number(fields.get('minutes')) : null, createdAt: new Date().toISOString() };
         try {
-            commitLibrary(library.map(game => game.id === selectedId ? { ...game, notes: [note, ...game.notes] } : game));
+            await commitLibrary(library.map(game => game.id === selectedId ? { ...game, notes: [note, ...game.notes] } : game));
             form.reset();
             byId('noteDate').value = today();
             showError('noteFormError');
@@ -239,12 +270,11 @@ function setupLibraryPage() {
         } catch (error) { showError('noteFormError', error.message); }
     });
     setupBackup();
-    const initialGame = new URLSearchParams(location.search).get('game');
-    if (initialGame) openDetails(initialGame);
 }
 
 async function saveGame(event) {
     event.preventDefault();
+    const epoch = scopeEpoch;
     const form = event.target;
     if (!form.reportValidity()) return;
     showError('gameFormError');
@@ -259,8 +289,9 @@ async function saveGame(event) {
         let image = existing?.image || '';
         if (stagedCover instanceof File) {
             const blob = await prepareCover(stagedCover);
+            assertScope(epoch);
             imageKey = crypto.randomUUID();
-            await coverStore('put', imageKey, blob);
+            await coverStore('put', imageKey, blob, epoch);
             coverUrls.set(imageKey, URL.createObjectURL(blob));
             image = '';
         } else if (stagedCover === '' || fields.get('image').trim()) {
@@ -268,7 +299,7 @@ async function saveGame(event) {
             image = safeImage(fields.get('image').trim());
         }
         const game = normalizeGame({ id, title, platform: fields.get('platform').trim(), year: fields.get('year'), status: fields.get('status'), rating: fields.get('rating'), image, imageKey, notes: existing?.notes || [] });
-        commitLibrary(existing ? library.map(item => item.id === id ? game : item) : [game, ...library]);
+        await commitLibrary(existing ? library.map(item => item.id === id ? game : item) : [game, ...library], epoch);
         byId('gameDialog').close();
         if (!existing) document.querySelector('[data-filter="all"]').click();
         renderLibrary();
@@ -281,6 +312,7 @@ async function saveGame(event) {
 
 function setupBackup() {
     byId('exportLibrary').addEventListener('click', async event => {
+        const epoch = scopeEpoch;
         const button = event.currentTarget;
         button.disabled = true;
         try {
@@ -288,10 +320,11 @@ function setupBackup() {
             const games = await Promise.all(library.map(async game => {
                 const { imageKey, ...metadata } = game;
                 if (!imageKey) return metadata;
-                const blob = await coverStore('get', imageKey);
+                const blob = await coverStore('get', imageKey, undefined, epoch);
                 if (!blob) throw new Error(`Brak lokalnej okładki gry „${game.title}”. Wybierz ją ponownie w edycji przed eksportem.`);
                 return { ...metadata, coverData: await blobToDataUrl(blob) };
             }));
+            assertScope(epoch);
             const url = URL.createObjectURL(new Blob([JSON.stringify({ version: 1, games }, null, 2)], { type: 'application/json' }));
             const link = document.createElement('a');
             link.href = url;
@@ -303,12 +336,14 @@ function setupBackup() {
         finally { button.disabled = false; }
     });
     byId('importLibrary').addEventListener('change', async event => {
+        const epoch = scopeEpoch;
         const file = event.target.files[0];
         event.target.value = '';
         if (!file) return;
         try {
             if (file.size > 50 * 1024 * 1024) throw new Error('Kopia jest za duża. Maksymalny rozmiar to 50 MB.');
             const data = JSON.parse(await file.text());
+            assertScope(epoch);
             if (data.version !== 1 || !Array.isArray(data.games) || data.games.length > 2000) throw new Error('Wybierz plik JSON wyeksportowany z GameLogs.');
             const ids = new Set();
             pendingImport = data.games.map(raw => {
@@ -325,23 +360,27 @@ function setupBackup() {
     byId('cancelImport').addEventListener('click', () => { pendingImport = null; byId('importDialog').close(); });
     byId('confirmImport').addEventListener('click', async event => {
         if (!pendingImport) return;
+        const epoch = scopeEpoch;
+        const items = pendingImport;
         const button = event.currentTarget;
         button.disabled = true;
         try {
             const games = [];
-            for (const { game, blob } of pendingImport) {
+            for (const { game, blob } of items) {
                 if (blob) {
                     const cleanBlob = await prepareCover(new File([blob], 'cover', { type: blob.type }));
+                    assertScope(epoch);
                     game.imageKey = crypto.randomUUID();
-                    await coverStore('put', game.imageKey, cleanBlob);
+                    await coverStore('put', game.imageKey, cleanBlob, epoch);
                 }
                 games.push(game);
             }
-            saveLibrary(games);
-            readError = '';
-            library = games;
+            assertScope(epoch);
+            if (cloudStore) await commitLibrary(games, epoch);
+            else { saveLibrary(games); readError = ''; library = games; }
             pendingImport = null;
             await hydrateCovers();
+            assertScope(epoch);
             byId('importDialog').close();
             document.querySelector('[data-filter="all"]').click();
             renderRecentNotes();
@@ -354,9 +393,16 @@ function setupBackup() {
 function setupDicePage() {
     const button = byId('rollButton');
     if (!button) return;
-    button.addEventListener('click', () => {
+    button.addEventListener('click', async () => {
+        const epoch = scopeEpoch;
         // Read again in case another tab changed the library.
-        try { library = loadLibrary(); } catch (error) { byId('diceMessage').textContent = error.message; return; }
+        try {
+            if (identityPending) throw new Error('Poczekaj na wczytanie konta.');
+            if (readError) throw new Error(readError);
+            const games = cloudStore ? await cloudStore.load() : loadLibrary();
+            assertScope(epoch);
+            library = games;
+        } catch (error) { byId('diceMessage').textContent = error.message; return; }
         const source = byId('diceSource').value;
         const games = source === 'all' ? library : library.filter(game => game.status === source);
         byId('randomResult').hidden = true;
@@ -365,7 +411,9 @@ function setupDicePage() {
         byId('diceFace').classList.add('is-rolling');
         byId('diceMessage').textContent = 'Kość wybiera…';
         setTimeout(async () => {
+            if (epoch !== scopeEpoch) return;
             await hydrateCovers();
+            if (epoch !== scopeEpoch) return;
             const game = games[Math.floor(Math.random() * games.length)];
             byId('diceFace').classList.remove('is-rolling');
             byId('diceFace').textContent = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][Math.floor(Math.random() * 6)];
@@ -378,6 +426,106 @@ function setupDicePage() {
 }
 
 setupTheme();
+setupGallery();
 setupLibraryPage();
 setupDicePage();
-hydrateCovers().then(() => { renderLibrary(); if (byId('detailDialog')?.open) renderDetails(); });
+
+async function changeIdentity(user, client, connectionError) {
+    const epoch = ++scopeEpoch;
+    identityPending = true;
+    document.querySelector('main').inert = true;
+    document.querySelectorAll('dialog:not(#accountDialog)').forEach(dialog => { if (dialog.open) dialog.close(); });
+    selectedId = null;
+    editingId = null;
+    pendingImport = null;
+    stagedCover = null;
+    revokePreview();
+    if (byId('randomResult')) byId('randomResult').hidden = true;
+    if (byId('rollButton')) byId('rollButton').disabled = false;
+    byId('diceFace')?.classList.remove('is-rolling');
+    for (const url of coverUrls.values()) URL.revokeObjectURL(url);
+    coverUrls.clear();
+    library = [];
+    renderLibrary();
+    renderRecentNotes();
+    cloudStore = user ? createCloudStore(client, user.id, normalizeGame) : null;
+    readError = '';
+    try {
+        if (connectionError) throw connectionError;
+        const games = cloudStore ? await cloudStore.load() : loadLibrary();
+        if (scopeEpoch !== epoch) return;
+        library = games;
+        renderLibrary();
+        renderRecentNotes();
+    } catch (error) {
+        if (scopeEpoch !== epoch) return;
+        readError = cloudStore || connectionError ? error.message : `Nie można odczytać lokalnej biblioteki: ${error.message}`;
+        library = [];
+        notify(readError, true);
+        throw error;
+    } finally {
+        if (scopeEpoch === epoch) {
+            identityPending = false;
+            document.querySelector('main').inert = false;
+        }
+    }
+    await hydrateCovers();
+    if (scopeEpoch === epoch) {
+        renderLibrary();
+        const initialGame = new URLSearchParams(location.search).get('game');
+        if (initialGame && byId('detailDialog')) openDetails(initialGame);
+    }
+}
+
+async function refreshCloudLibrary() {
+    if (!cloudStore || writePending || identityPending) throw new Error('Poczekaj na zakończenie zapisu.');
+    const epoch = scopeEpoch;
+    const store = cloudStore;
+    identityPending = true;
+    let games;
+    try { games = await store.load(); assertScope(epoch); }
+    finally { if (epoch === scopeEpoch) identityPending = false; }
+    library = games;
+    readError = '';
+    await hydrateCovers();
+    assertScope(epoch);
+    renderLibrary();
+    renderRecentNotes();
+    if (byId('detailDialog')?.open) renderDetails();
+}
+
+async function migrateLocalLibrary() {
+    if (!cloudStore) throw new Error('Zaloguj się, aby przenieść lokalne gry.');
+    if (readError) throw new Error('Najpierw odśwież bibliotekę konta.');
+    const epoch = scopeEpoch;
+    const store = cloudStore;
+    const local = loadLibrary();
+    const existing = new Set(library.map(game => game.id));
+    const additions = [];
+    for (const game of local.filter(item => !existing.has(item.id))) {
+        if (epoch !== scopeEpoch) throw new Error('Sesja konta się zmieniła.');
+        if (game.imageKey) {
+            const blob = await localCoverStore('get', game.imageKey);
+            assertScope(epoch);
+            if (!blob) throw new Error(`Nie można odczytać okładki gry „${game.title}”. Popraw ją w lokalnej bibliotece przed przeniesieniem.`);
+            const key = crypto.randomUUID();
+            await store.cover('put', key, blob);
+            assertScope(epoch);
+            additions.push({ ...game, imageKey: key });
+        } else additions.push(game);
+    }
+    if (!additions.length) throw new Error('Nie ma nowych lokalnych gier do przeniesienia.');
+    await commitLibrary([...library, ...additions], epoch);
+    await hydrateCovers();
+    renderLibrary();
+    renderRecentNotes();
+}
+
+if (identityPending) document.querySelector('main').inert = true;
+mountAccount({
+    onUserChange: changeIdentity,
+    onRefresh: refreshCloudLibrary,
+    onMigrate: migrateLocalLibrary,
+    isBusy: () => writePending || identityPending,
+    canMigrate: () => { try { return Boolean(cloudStore && localStorage.getItem('gamelogs:library')); } catch { return false; } }
+}).catch(error => notify(error.message, true));

@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="GameLogs — osobisty katalog i dziennik gier.">
     <title>GameLogs — moja biblioteka</title>
-    <link rel="stylesheet" href="style.css?v=20261016-3">
+    <link rel="stylesheet" href="style.css?v=20261016-6">
     <link rel="icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js?v=20261016-3"></script>
+    <script type="module" src="script.js?v=20261016-6"></script>
 </head>
 <body data-page="library">
     <header class="site-header">
@@ -21,9 +21,10 @@
                 <a href="#dziennik">Dziennik</a>
                 <a href="dice.html">Losuj grę</a>
             </nav>
-            <button class="icon-button" id="themeToggle" type="button" aria-label="Włącz jasny motyw" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button>
+            <div class="header-actions"><button class="button button-secondary account-button" id="accountButton" type="button">Zaloguj się</button><button class="icon-button" id="themeToggle" type="button" aria-label="Włącz jasny motyw" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button></div>
         </div>
     </header>
+    <aside class="account-status page-width"><p id="accountStatus" role="status">Tryb lokalny · dane zapisane w tej przeglądarce</p></aside>
     <main>
         <section class="hero page-width" aria-labelledby="heroTitle">
             <p class="eyebrow">Twój dziennik gier</p>
@@ -50,13 +51,31 @@
             <div><p class="eyebrow">Twoje historie</p><h2 id="journalTitle">Dziennik gracza</h2></div>
             <div id="recentNotes" class="recent-notes"><p class="empty-state">Otwórz grę i dodaj pierwszy wpis z sesji.</p></div>
         </section>
-        <section class="gallery-section" aria-labelledby="galleryTitle">
-            <div class="page-width"><p class="eyebrow">Kadry z gier</p><h2 id="galleryTitle">Galeria</h2></div>
-            <div class="gallery-track" aria-label="Galeria screenshotów">
-                <img src="images/slider/witcher3-1.png" alt="The Witcher 3: Wild Hunt — kadr z gry" loading="lazy">
-                <img src="images/slider/cyberpunk-1.jpg" alt="Cyberpunk 2077 — kadr z gry" loading="lazy">
-                <img src="images/slider/gow-rag-1.jpg" alt="God of War Ragnarök — kadr z gry" loading="lazy">
-                <img src="images/slider/dishonored-1.jpg" alt="Dishonored — kadr z gry" loading="lazy">
+        <section class="gallery-section" aria-labelledby="galleryTitle" aria-roledescription="karuzela">
+            <div class="page-width">
+                <div class="section-heading gallery-heading"><div><p class="eyebrow">Kadry z gier</p><h2 id="galleryTitle">Galeria</h2></div><div class="gallery-controls"><span id="galleryCounter" class="gallery-counter">1–3 / 18</span><button class="icon-button gallery-arrow" id="galleryPrevious" type="button" aria-label="Poprzednie kadry" aria-controls="galleryTrack" disabled>←</button><button class="icon-button gallery-arrow" id="galleryNext" type="button" aria-label="Następne kadry" aria-controls="galleryTrack">→</button></div></div>
+                <p class="gallery-hint" id="galleryHint">Przeciągnij kadry lub użyj strzałek. Kliknij zdjęcie, aby je powiększyć.</p>
+                <div class="gallery-track" id="galleryTrack" tabindex="0" role="region" aria-label="Galeria screenshotów" aria-describedby="galleryHint">
+                    <a class="gallery-item" href="images/slider/witcher3-1.png" target="_blank" rel="noopener" aria-label="The Witcher 3: Wild Hunt — kadr 1, otwórz w nowej karcie"><img src="images/slider/witcher3-1.png" alt="The Witcher 3: Wild Hunt — kadr z gry" loading="lazy" draggable="false"><span>The Witcher 3: Wild Hunt</span></a>
+                    <a class="gallery-item" href="images/slider/witcher3-2.png" target="_blank" rel="noopener" aria-label="The Witcher 3: Wild Hunt — kadr 2, otwórz w nowej karcie"><img src="images/slider/witcher3-2.png" alt="The Witcher 3: Wild Hunt — kadr z gry" loading="lazy" draggable="false"><span>The Witcher 3: Wild Hunt</span></a>
+                    <a class="gallery-item" href="images/slider/witcher3-3.png" target="_blank" rel="noopener" aria-label="The Witcher 3: Wild Hunt — kadr 3, otwórz w nowej karcie"><img src="images/slider/witcher3-3.png" alt="The Witcher 3: Wild Hunt — kadr z gry" loading="lazy" draggable="false"><span>The Witcher 3: Wild Hunt</span></a>
+                    <a class="gallery-item" href="images/slider/witcher-4.jpg" target="_blank" rel="noopener" aria-label="The Witcher 3: Wild Hunt — kadr 4, otwórz w nowej karcie"><img src="images/slider/witcher-4.jpg" alt="The Witcher 3: Wild Hunt — kadr z gry" loading="lazy" draggable="false"><span>The Witcher 3: Wild Hunt</span></a>
+                    <a class="gallery-item" href="images/slider/cyberpunk-1.jpg" target="_blank" rel="noopener" aria-label="Cyberpunk 2077 — kadr 5, otwórz w nowej karcie"><img src="images/slider/cyberpunk-1.jpg" alt="Cyberpunk 2077 — kadr z gry" loading="lazy" draggable="false"><span>Cyberpunk 2077</span></a>
+                    <a class="gallery-item" href="images/slider/cyberpunk-2.jpg" target="_blank" rel="noopener" aria-label="Cyberpunk 2077 — kadr 6, otwórz w nowej karcie"><img src="images/slider/cyberpunk-2.jpg" alt="Cyberpunk 2077 — kadr z gry" loading="lazy" draggable="false"><span>Cyberpunk 2077</span></a>
+                    <a class="gallery-item" href="images/slider/cyberpunk-3.jpg" target="_blank" rel="noopener" aria-label="Cyberpunk 2077 — kadr 7, otwórz w nowej karcie"><img src="images/slider/cyberpunk-3.jpg" alt="Cyberpunk 2077 — kadr z gry" loading="lazy" draggable="false"><span>Cyberpunk 2077</span></a>
+                    <a class="gallery-item" href="images/slider/cyberpunk-4.jpg" target="_blank" rel="noopener" aria-label="Cyberpunk 2077 — kadr 8, otwórz w nowej karcie"><img src="images/slider/cyberpunk-4.jpg" alt="Cyberpunk 2077 — kadr z gry" loading="lazy" draggable="false"><span>Cyberpunk 2077</span></a>
+                    <a class="gallery-item" href="images/slider/dishonored-1.jpg" target="_blank" rel="noopener" aria-label="Dishonored — kadr 9, otwórz w nowej karcie"><img src="images/slider/dishonored-1.jpg" alt="Dishonored — kadr z gry" loading="lazy" draggable="false"><span>Dishonored</span></a>
+                    <a class="gallery-item" href="images/slider/dishonored-2.jpg" target="_blank" rel="noopener" aria-label="Dishonored — kadr 10, otwórz w nowej karcie"><img src="images/slider/dishonored-2.jpg" alt="Dishonored — kadr z gry" loading="lazy" draggable="false"><span>Dishonored</span></a>
+                    <a class="gallery-item" href="images/slider/got-1.jpg" target="_blank" rel="noopener" aria-label="Ghost of Tsushima — kadr 11, otwórz w nowej karcie"><img src="images/slider/got-1.jpg" alt="Ghost of Tsushima — kadr z gry" loading="lazy" draggable="false"><span>Ghost of Tsushima</span></a>
+                    <a class="gallery-item" href="images/slider/got-2.jpg" target="_blank" rel="noopener" aria-label="Ghost of Tsushima — kadr 12, otwórz w nowej karcie"><img src="images/slider/got-2.jpg" alt="Ghost of Tsushima — kadr z gry" loading="lazy" draggable="false"><span>Ghost of Tsushima</span></a>
+                    <a class="gallery-item" href="images/slider/gow-rag-1.jpg" target="_blank" rel="noopener" aria-label="God of War Ragnarök — kadr 13, otwórz w nowej karcie"><img src="images/slider/gow-rag-1.jpg" alt="God of War Ragnarök — kadr z gry" loading="lazy" draggable="false"><span>God of War Ragnarök</span></a>
+                    <a class="gallery-item" href="images/slider/gow-rag-2.png" target="_blank" rel="noopener" aria-label="God of War Ragnarök — kadr 14, otwórz w nowej karcie"><img src="images/slider/gow-rag-2.png" alt="God of War Ragnarök — kadr z gry" loading="lazy" draggable="false"><span>God of War Ragnarök</span></a>
+                    <a class="gallery-item" href="images/slider/Sekiro-1.jpg" target="_blank" rel="noopener" aria-label="Sekiro: Shadows Die Twice — kadr 15, otwórz w nowej karcie"><img src="images/slider/Sekiro-1.jpg" alt="Sekiro: Shadows Die Twice — kadr z gry" loading="lazy" draggable="false"><span>Sekiro: Shadows Die Twice</span></a>
+                    <a class="gallery-item" href="images/slider/hogwarts-1.png" target="_blank" rel="noopener" aria-label="Hogwarts Legacy — kadr 16, otwórz w nowej karcie"><img src="images/slider/hogwarts-1.png" alt="Hogwarts Legacy — kadr z gry" loading="lazy" draggable="false"><span>Hogwarts Legacy</span></a>
+                    <a class="gallery-item" href="images/slider/elden-1.jpg" target="_blank" rel="noopener" aria-label="Elden Ring — kadr 17, otwórz w nowej karcie"><img src="images/slider/elden-1.jpg" alt="Elden Ring — kadr z gry" loading="lazy" draggable="false"><span>Elden Ring</span></a>
+                    <a class="gallery-item" href="images/slider/lis-1.jpg" target="_blank" rel="noopener" aria-label="Life Is Strange — kadr 18, otwórz w nowej karcie"><img src="images/slider/lis-1.jpg" alt="Life Is Strange — kadr z gry" loading="lazy" draggable="false"><span>Life Is Strange</span></a>
+                </div>
+                <input class="gallery-progress" id="galleryProgress" type="range" min="0" max="1000" value="0" step="1" aria-label="Przewiń galerię">
             </div>
         </section>
     </main>
@@ -94,6 +113,6 @@
         </div>
     </dialog>
     <dialog class="game-dialog" id="importDialog" aria-labelledby="importTitle"><div class="detail-content"><h2 id="importTitle">Przywrócić bibliotekę?</h2><p id="importSummary"></p><p>Import zastąpi obecną bibliotekę. Najpierw wyeksportuj ją, jeśli chcesz zachować jej kopię.</p><p class="form-error" id="importError" role="alert" hidden></p><div class="dialog-actions"><button class="button button-secondary" id="cancelImport" type="button">Anuluj</button><button class="button button-primary" id="confirmImport" type="button">Przywróć bibliotekę</button></div></div></dialog>
-    <footer class="site-footer"><p>GameLogs <span>·</span> lokalny dziennik gier</p></footer>
+    <footer class="site-footer"><p>GameLogs <span>·</span> Twój dziennik gier</p></footer>
 </body>
 </html>

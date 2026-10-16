@@ -84,6 +84,19 @@ img { display: block; max-width: 100%; }
 
 .brand { font-size: 21px; font-weight: 700; letter-spacing: -.07em; }
 .brand span { color: var(--accent); }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.account-button { white-space: nowrap; }
+.account-status p { margin: 16px 0 0; color: var(--muted); font-size: 13px; }
+.account-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 22px; }
+.auth-form { display: grid; gap: 18px; margin-top: 24px; }
+.auth-form label { display: grid; gap: 7px; color: var(--muted); font-size: 14px; }
+.auth-form input { min-width: 0; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--background); color: var(--text); font-size: 16px; }
+.auth-form .journal-meta { margin: 0; }
+.account-message { margin-top: 20px; color: var(--accent); }
+.migration-panel { margin-top: 24px; padding-block: 20px; border-top: 1px solid var(--line); }
+.migration-panel h3 { margin: 0; font-size: 17px; }
+.migration-panel p, #accountDescription, #accountProfile > p { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.signout-button { display: block; margin-top: 20px; }
 
 .primary-nav { display: flex; justify-content: flex-end; gap: 6px; }
 
@@ -247,8 +260,24 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 .journal-meta { margin: 25px 0 0; color: var(--muted); font-size: 14px; }
 
 .gallery-section { padding-block: 74px; border-top: 1px solid var(--line); }
-.gallery-track { display: grid; grid-auto-columns: minmax(230px, calc(var(--content-max) / 3.4)); grid-auto-flow: column; gap: 16px; margin-top: 32px; padding: 0 max(24px, calc((100% - var(--content-max)) / 2)) 8px; overflow-x: auto; scroll-snap-type: x mandatory; }
-.gallery-track img { width: 100%; aspect-ratio: 16 / 10; border-radius: 12px; object-fit: cover; scroll-snap-align: start; }
+.gallery-heading { align-items: center; flex-direction: row; }
+.gallery-controls { display: flex; align-items: center; gap: 10px; }
+.gallery-counter { margin-right: 8px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gallery-arrow { border: 1px solid var(--line); font-size: 22px; }
+.gallery-arrow:disabled { cursor: default; opacity: .3; }
+.gallery-hint { margin: 14px 0 24px; color: var(--muted); font-size: 13px; }
+.gallery-track { position: relative; display: grid; grid-auto-columns: calc((100% - 32px) / 3); grid-auto-flow: column; gap: 16px; overflow-x: auto; scrollbar-width: none; cursor: grab; user-select: none; overscroll-behavior-x: contain; }
+.gallery-track::-webkit-scrollbar { display: none; }
+.gallery-track.is-dragging, .gallery-track.is-dragging a { cursor: grabbing; }
+.gallery-item { position: relative; display: block; overflow: hidden; border-radius: 12px; background: var(--surface); cursor: grab; }
+.gallery-track img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform .35s ease; pointer-events: none; }
+.gallery-item span { position: absolute; inset: auto 0 0; padding: 32px 16px 15px; background: linear-gradient(transparent, rgba(0, 0, 0, .85)); color: #fff; font-size: 13px; pointer-events: none; }
+@media (hover: hover) { .gallery-item:hover img { transform: scale(1.035); } }
+.gallery-progress { display: block; width: 100%; height: 32px; margin: 15px 0 0; background: transparent; cursor: ew-resize; appearance: none; accent-color: var(--accent); }
+.gallery-progress::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: var(--line); }
+.gallery-progress::-webkit-slider-thumb { width: clamp(40px, 16%, 160px); height: 8px; margin-top: -2px; border-radius: 8px; background: var(--accent); appearance: none; }
+.gallery-progress::-moz-range-track { height: 4px; border-radius: 4px; background: var(--line); }
+.gallery-progress::-moz-range-thumb { width: 70px; height: 8px; border: 0; border-radius: 8px; background: var(--accent); }
 
 .site-footer { padding: 34px 24px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; }
 .site-footer p { margin: 0; font-size: 14px; }
@@ -348,7 +377,7 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
     .select-label, .rating-label, .status-hint { font-size: 14px; }
     .status-select { font-size: 16px; min-height: 42px; }
     .eyebrow { font-size: 14px; }
-    .gallery-track { gap: 24px; }
+    .gallery-track { grid-auto-columns: calc((100% - 48px) / 3); gap: 24px; }
 }
 
 @media (max-width: 920px) {
@@ -359,6 +388,8 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 }
 
 @media (max-width: 650px) {
+    .header-actions { gap: 8px; }
+    .account-button { padding: 8px 10px; font-size: 13px; }
     input, select { font-size: 16px; }
     :root { --page-width: min(100% - 32px, 1120px); }
     .nav-shell { grid-template-columns: 1fr auto; min-height: auto; padding-block: 13px 0; gap: 12px; }
@@ -379,7 +410,9 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
     .journal-section { grid-template-columns: 1fr; gap: 28px; padding-block: 58px; }
     .journal-note { padding: 24px; }
     .gallery-section { padding-block: 58px; }
-    .gallery-track { grid-auto-columns: 78%; padding-left: 16px; padding-right: 16px; }
+    .gallery-track { grid-auto-columns: 86%; }
+    .gallery-counter { margin-right: 0; font-size: 12px; }
+    .gallery-controls { gap: 6px; }
     .form-grid { grid-template-columns: 1fr; }
     .form-wide { grid-column: auto; }
     .dialog-actions { flex-direction: column-reverse; }
