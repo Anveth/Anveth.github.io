@@ -117,3 +117,11 @@ test('all six SVG dice faces have the right pip count and symmetric geometry', a
     const script = await readFile(new URL('../script.js', import.meta.url), 'utf8');
     assert.match(script, /byId\('diceFace'\)\.dataset\.value/);
 });
+
+test('rolling hides the welcome text or previous pick without collapsing the result area', async () => {
+    const script = await readFile(new URL('../script.js', import.meta.url), 'utf8');
+    assert.match(css, /\.dice-panel:has\(\.dice-face\.is-rolling\) \.dice-result-area \{ visibility: hidden; \}/);
+    const picker = script.slice(script.indexOf('function setupDicePage()'), script.indexOf('\nsetupTheme();'));
+    assert.doesNotMatch(picker.slice(0, picker.indexOf('if (!games.length)')), /byId\('randomResult'\)\.hidden = true/);
+    assert.match(picker, /if \(!games.length\) \{\s*byId\('randomResult'\)\.hidden = true/);
+});

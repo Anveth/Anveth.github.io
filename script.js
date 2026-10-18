@@ -482,8 +482,11 @@ function setupDicePage() {
         } catch (error) { byId('diceMessage').textContent = error.message; return; }
         const source = byId('diceSource').value;
         const games = source === 'all' ? library : library.filter(game => game.status === source);
-        byId('randomResult').hidden = true;
-        if (!games.length) { byId('diceMessage').textContent = 'No games in this list. Add a game or choose another list.'; return; }
+        if (!games.length) {
+            byId('randomResult').hidden = true;
+            byId('diceMessage').textContent = 'No games in this list. Add a game or choose another list.';
+            return;
+        }
         button.disabled = true;
         byId('diceFace').classList.add('is-rolling');
         byId('diceMessage').textContent = 'Rolling…';

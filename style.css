@@ -385,6 +385,8 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 .dice-empty h2 { margin: 0; font-size: clamp(38px, 3.5vw, 56px); line-height: 1.1; text-wrap: balance; }
 .dice-empty > p:last-child { max-width: 510px; margin: 24px 0 0; color: var(--muted); font-size: 18px; line-height: 1.65; }
 .random-result:not([hidden]) + .dice-empty { display: none; }
+/* Hide the welcome text or previous result without collapsing its space. */
+.dice-panel:has(.dice-face.is-rolling) .dice-result-area { visibility: hidden; }
 
 .library-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
 .library-tools .game-count { margin: 0; }
