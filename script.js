@@ -493,9 +493,9 @@ function setupDicePage() {
             if (epoch !== scopeEpoch) return;
             const game = games[Math.floor(Math.random() * games.length)];
             byId('diceFace').classList.remove('is-rolling');
-            byId('diceFace').textContent = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][Math.floor(Math.random() * 6)];
-            byId('diceMessage').textContent = 'Today’s pick:';
-            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover')}<div><p class="result-title">${escapeHtml(game.title)}</p><p class="result-meta">${escapeHtml(game.platform)}${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button" href="index.html?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
+            byId('diceFace').dataset.value = String(1 + Math.floor(Math.random() * 6));
+            byId('diceMessage').textContent = `Today’s pick: ${game.title}`;
+            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover', true)}<div class="result-content"><p class="eyebrow">Today’s pick</p><h2 class="result-title" id="resultTitle">${escapeHtml(game.title)}</h2><p class="result-meta">${escapeHtml(game.platform)}${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button result-journal-link" href="index.html?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
             byId('randomResult').hidden = false;
             button.disabled = false;
         }, 550);
