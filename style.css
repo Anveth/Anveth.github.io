@@ -380,8 +380,10 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 .result-status { margin: 14px 0 0; color: var(--muted); font-size: 16px; }
 .result-status { margin-top: 6px; color: var(--accent); font-weight: 700; }
 .random-result .result-journal-link { min-height: 44px; margin-top: 20px; color: var(--journal-accent); font-size: 16px; }
-.dice-empty h2 { margin: 0; font-size: clamp(28px, 2.4vw, 38px); line-height: 1.15; }
-.dice-empty > p:last-child { max-width: 330px; margin: 16px 0 0; color: var(--muted); }
+.dice-empty { max-width: 640px; }
+.dice-empty .eyebrow { margin-bottom: 18px; font-size: 16px; }
+.dice-empty h2 { margin: 0; font-size: clamp(38px, 3.5vw, 56px); line-height: 1.1; text-wrap: balance; }
+.dice-empty > p:last-child { max-width: 510px; margin: 24px 0 0; color: var(--muted); font-size: 18px; line-height: 1.65; }
 .random-result:not([hidden]) + .dice-empty { display: none; }
 
 .library-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
@@ -500,6 +502,9 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
     .dice-controls { --dice-size: 160px; }
     .dice-face { margin-bottom: 18px; }
     .dice-controls .dice-button { font-size: 15px; letter-spacing: .01em; }
+    .dice-empty .eyebrow { font-size: 13px; margin-bottom: 14px; }
+    .dice-empty h2 { font-size: clamp(30px, 8vw, 40px); }
+    .dice-empty > p:last-child { margin-top: 18px; font-size: 16px; }
     .random-result { grid-template-columns: minmax(80px, 30%) minmax(0, 1fr); gap: 18px; }
     .result-title { font-size: clamp(22px, 6vw, 28px); }
     .result-meta, .result-status { font-size: 14px; }

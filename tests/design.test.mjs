@@ -93,6 +93,8 @@ test('game picker dedicates space to a large accessible result and stacks on sma
     assert.match(css, /\.dice-panel\s*\{[^}]*grid-template-columns: minmax\(220px, \.7fr\) minmax\(0, 1\.3fr\)/);
     assert.match(css, /\.dice-panel\s*\{ grid-template-columns: 1fr/);
     assert.match(css, /\.random-result:not\(\[hidden\]\) \+ \.dice-empty\s*\{ display: none/);
+    assert.match(css, /\.dice-empty h2\s*\{[^}]*font-size: clamp\(38px, 3\.5vw, 56px\)/);
+    assert.match(css, /\.dice-empty > p:last-child\s*\{[^}]*max-width: 510px;[^}]*font-size: 18px/);
     assert.match(script, /<h2 class="result-title" id="resultTitle">\$\{escapeHtml\(game.title\)\}/);
     assert.match(script, /gameCover\(game, 'result-cover', true\)/);
 });
