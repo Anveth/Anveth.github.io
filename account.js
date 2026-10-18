@@ -1,14 +1,21 @@
-import { SUPABASE_CONFIG } from './config.js?v=20261016-6';
-import { connectSupabase, friendlyError } from './cloud.js?v=20261016-6';
+import { SUPABASE_CONFIG } from './config.js?v=20261018-2';
+import { connectSupabase, friendlyError } from './cloud.js?v=20261018-2';
+
+export const PASSWORD_MIN_LENGTH = 9;
+export function validateNewPassword(password) {
+    if (typeof password !== 'string' || password.length < PASSWORD_MIN_LENGTH) return `Your password must have at least ${PASSWORD_MIN_LENGTH} characters. Special characters are optional.`;
+    if (password.length > 128) return 'Your password can have up to 128 characters.';
+    return '';
+}
 
 const authError = error => ({
-    invalid_credentials: 'Nieprawidłowy e-mail lub hasło.',
-    email_not_confirmed: 'Potwierdź adres e-mail, klikając link w wiadomości od GameLogs.',
-    user_already_exists: 'Sprawdź skrzynkę pocztową lub zaloguj się do istniejącego konta.',
-    over_email_send_rate_limit: 'Limit wiadomości został osiągnięty. Spróbuj później.',
-    weak_password: 'Wybierz silniejsze hasło, zgodne z wymaganiami usługi.',
-    signup_disabled: 'Rejestracja nowych kont jest chwilowo wyłączona.',
-    email_address_not_authorized: 'Rejestracja e-mail nie jest jeszcze gotowa dla tego adresu. Administrator musi skonfigurować wysyłkę wiadomości.'
+    invalid_credentials: 'Invalid email or password.',
+    email_not_confirmed: 'Confirm your email using the link from GameLogs.',
+    user_already_exists: 'Check your inbox or log in to your existing account.',
+    over_email_send_rate_limit: 'Email limit reached. Please try again later.',
+    weak_password: 'Choose a password that meets the service requirements.',
+    signup_disabled: 'New account registration is temporarily disabled.',
+    email_address_not_authorized: 'Email registration is not yet available for this address. The administrator needs to configure email delivery.'
 }[error?.code] || friendlyError(error));
 
 export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigrate, isBusy }) {
@@ -19,21 +26,21 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
     dialog.id = 'accountDialog';
     dialog.setAttribute('aria-labelledby', 'accountTitle');
     dialog.innerHTML = `<div class="detail-content">
-        <div class="dialog-heading"><div><p class="eyebrow">Twoja przestrzeń</p><h2 id="accountTitle">Zaloguj się</h2></div><button class="close-button" id="closeAccount" type="button" aria-label="Zamknij konto">×</button></div>
-        <p id="accountDescription">Twoje gry i notatki, dostępne na każdym urządzeniu.</p>
-        <div class="account-tabs" id="accountTabs"><button type="button" class="filter-button" data-auth-mode="login">Logowanie</button><button type="button" class="filter-button" data-auth-mode="signup">Rejestracja</button></div>
+        <div class="dialog-heading"><div><p class="eyebrow">Your space</p><h2 id="accountTitle">Log in</h2></div><button class="close-button" id="closeAccount" type="button" aria-label="Close account">×</button></div>
+        <p id="accountDescription">Your games and notes, on every device.</p>
+        <div class="account-tabs" id="accountTabs"><button type="button" class="filter-button" data-auth-mode="login">Log in</button><button type="button" class="filter-button" data-auth-mode="signup">Sign up</button></div>
         <form id="authForm" class="auth-form">
-            <label id="emailLabel">E-mail<input id="authEmail" name="email" type="email" autocomplete="email" required maxlength="254"></label>
-            <label id="passwordLabel">Hasło<input id="authPassword" name="password" type="password" autocomplete="current-password" required maxlength="128"></label>
-            <label id="repeatPasswordLabel" hidden>Powtórz hasło<input id="authRepeatPassword" name="repeatPassword" type="password" autocomplete="new-password" maxlength="128"></label>
-            <p class="journal-meta" id="passwordHint" hidden>Co najmniej 10 znaków. Użyj unikalnego hasła.</p>
-            <button class="button button-primary" id="authSubmit" type="submit">Zaloguj się</button>
+            <label id="emailLabel">Email<input id="authEmail" name="email" type="email" autocomplete="email" required maxlength="254"></label>
+            <label id="passwordLabel">Password<input id="authPassword" name="password" type="password" autocomplete="current-password" required maxlength="128"></label>
+            <label id="repeatPasswordLabel" hidden>Confirm password<input id="authRepeatPassword" name="repeatPassword" type="password" autocomplete="new-password" maxlength="128"></label>
+            <p class="journal-meta" id="passwordHint" hidden>At least ${PASSWORD_MIN_LENGTH} characters. Special characters are optional. Use a unique password.</p>
+            <button class="button button-primary" id="authSubmit" type="submit">Log in</button>
         </form>
-        <button class="text-button" id="forgotPassword" type="button">Nie pamiętam hasła</button>
-        <div id="accountProfile" hidden><p id="accountEmail"></p><p>Biblioteka tego konta jest prywatna. Gry i sesje zapisują się na serwerze.</p>
-            <button class="button button-secondary" id="refreshCloud" type="button">Odśwież bibliotekę</button>
-            <div class="migration-panel" id="migrationPanel" hidden><h3>Przenieś lokalną kolekcję</h3><p>Dodaj do konta gry zapisane wcześniej w tej przeglądarce, razem z okładkami i dziennikami. Gry o identyfikatorach już istniejących na koncie zostaną pominięte.</p><button class="button button-secondary" id="migrateLibrary" type="button">Dodaj lokalne gry do konta</button></div>
-            <button class="text-button signout-button" id="signOut" type="button">Wyloguj się</button>
+        <button class="text-button" id="forgotPassword" type="button">Forgot password?</button>
+        <div id="accountProfile" hidden><p id="accountEmail"></p><p>Your account library is private. Games and journal entries are saved to the server.</p>
+            <button class="button button-secondary" id="refreshCloud" type="button">Refresh library</button>
+            <div class="migration-panel" id="migrationPanel" hidden><h3>Bring your local collection</h3><p>Add games saved in this browser to your account, including covers and journals. Games already on your account will be skipped.</p><button class="button button-secondary" id="migrateLibrary" type="button">Add local games to account</button></div>
+            <button class="text-button signout-button" id="signOut" type="button">Log out</button>
         </div>
         <p id="authMessage" role="status" hidden></p>
     </div>`;
@@ -61,29 +68,29 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
         const reset = mode === 'reset';
         const recover = mode === 'recover';
         const signup = mode === 'signup';
-        el('accountTitle').textContent = profile ? 'Moje konto' : reset ? 'Odzyskaj dostęp' : recover ? 'Ustaw nowe hasło' : signup ? 'Utwórz konto' : 'Zaloguj się';
-        el('accountDescription').textContent = !configured ? 'Konta nie są jeszcze uruchomione. Możesz nadal korzystać z lokalnej biblioteki w tej przeglądarce.' : profile ? 'Twoja biblioteka zapisuje się na Twoim koncie.' : 'Twoje gry i notatki, dostępne na każdym urządzeniu.';
+        el('accountTitle').textContent = profile ? 'My account' : reset ? 'Reset password' : recover ? 'Set a new password' : signup ? 'Create account' : 'Log in';
+        el('accountDescription').textContent = !configured ? 'Accounts are not available yet. You can still use your local library in this browser.' : profile ? 'Your library is saved to your account.' : 'Your games and notes, on every device.';
         el('accountTabs').hidden = !configured || profile || recover || reset;
         el('authForm').hidden = !configured || profile;
         el('accountProfile').hidden = !profile;
         el('forgotPassword').hidden = !configured || profile || recover;
-        el('forgotPassword').textContent = reset ? 'Wróć do logowania' : 'Nie pamiętam hasła';
+        el('forgotPassword').textContent = reset ? 'Back to log in' : 'Forgot password?';
         el('emailLabel').hidden = recover;
         el('authEmail').required = !recover;
         el('authEmail').disabled = recover;
         el('passwordLabel').hidden = reset;
         el('authPassword').required = !reset;
         el('authPassword').disabled = reset;
-        el('authPassword').minLength = signup || recover ? 10 : 1;
+        el('authPassword').minLength = signup || recover ? PASSWORD_MIN_LENGTH : 1;
         el('authPassword').autocomplete = signup || recover ? 'new-password' : 'current-password';
         el('repeatPasswordLabel').hidden = !(signup || recover);
         el('authRepeatPassword').required = signup || recover;
         el('authRepeatPassword').disabled = !(signup || recover);
         el('passwordHint').hidden = !(signup || recover);
-        el('authSubmit').textContent = reset ? 'Wyślij link do zmiany hasła' : recover ? 'Zapisz nowe hasło' : signup ? 'Utwórz konto' : 'Zaloguj się';
+        el('authSubmit').textContent = reset ? 'Send reset link' : recover ? 'Save new password' : signup ? 'Create account' : 'Log in';
         el('accountEmail').textContent = user?.email || '';
         el('migrationPanel').hidden = !profile || !canMigrate();
-        button.textContent = user ? 'Moje konto' : 'Zaloguj się';
+        button.textContent = user ? 'My account' : 'Log in';
         dialog.querySelectorAll('[data-auth-mode]').forEach(item => {
             item.classList.toggle('is-selected', item.dataset.authMode === mode);
             item.setAttribute('aria-pressed', String(item.dataset.authMode === mode));
@@ -110,12 +117,12 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
             lastOwner = nextOwner;
             user = nextUser;
             render();
-            status.textContent = user ? 'Wczytywanie prywatnej biblioteki…' : 'Tryb lokalny · dane zapisane w tej przeglądarce';
+            status.textContent = user ? 'Loading your private library…' : 'Local mode · saved in this browser';
             try {
                 await onUserChange(user, client);
-                status.textContent = user ? 'Biblioteka na Twoim koncie · zmiany zapisują się na serwerze' : 'Tryb lokalny · zaloguj się, aby zapisywać na koncie';
+                status.textContent = user ? 'Account library · changes are saved to the server' : 'Local mode · log in to save to your account';
             } catch (error) {
-                status.textContent = 'Nie udało się wczytać biblioteki konta. Otwórz Moje konto i spróbuj odświeżyć.';
+                status.textContent = 'Unable to load your account library. Open My account and try refreshing it.';
                 message(friendlyError(error), true);
             }
             render();
@@ -133,8 +140,12 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
         if (!client || authPending || !event.target.reportValidity()) return;
         const email = el('authEmail').value.trim();
         const password = el('authPassword').value;
-        if ((mode === 'signup' || mode === 'recover') && password !== el('authRepeatPassword').value) { message('Hasła nie są identyczne.', true); return; }
-        if (mode === 'recover' && !user) { message('Otwórz ważny link do odzyskiwania hasła z wiadomości e-mail.', true); return; }
+        if (mode === 'signup' || mode === 'recover') {
+            const passwordError = validateNewPassword(password);
+            if (passwordError) { message(passwordError, true); return; }
+        }
+        if ((mode === 'signup' || mode === 'recover') && password !== el('authRepeatPassword').value) { message('Passwords do not match.', true); return; }
+        if (mode === 'recover' && !user) { message('Open a valid password reset link from your email.', true); return; }
         authPending = true;
         el('authSubmit').disabled = true;
         message();
@@ -143,17 +154,17 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
             if (mode === 'reset') {
                 const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
                 if (error) throw error;
-                message('Jeżeli konto istnieje, otrzymasz wiadomość z linkiem do zmiany hasła. Sprawdź też spam.');
+                message('If an account exists, you will receive a password reset link. Check your spam folder too.');
             } else if (mode === 'recover') {
                 const { error } = await client.auth.updateUser({ password });
                 if (error) throw error;
                 setMode('profile');
-                message('Hasło zostało zmienione.');
+                message('Your password has been updated.');
             } else if (mode === 'signup') {
                 const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
                 if (error) throw error;
-                if (data.session) { await queueIdentity(data.session, 'SIGNED_IN'); setMode('profile'); message('Konto jest gotowe. Dodaj pierwszą grę.'); }
-                else message('Sprawdź skrzynkę pocztową i potwierdź adres e-mail. Jeżeli konto już istnieje, zaloguj się lub odzyskaj hasło.');
+                if (data.session) { await queueIdentity(data.session, 'SIGNED_IN'); setMode('profile'); message('Your account is ready. Add your first game.'); }
+                else message('Check your inbox and confirm your email. If you already have an account, log in or reset your password.');
             } else {
                 const { data, error } = await client.auth.signInWithPassword({ email, password });
                 if (error) throw error;
@@ -166,7 +177,7 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
     });
 
     async function runAccountAction(buttonId, action, success) {
-        if (authPending || isBusy()) { message('Poczekaj na zakończenie bieżącego zapisu.', true); return; }
+        if (authPending || isBusy()) { message('Please wait for the current save to finish.', true); return; }
         authPending = true;
         el(buttonId).disabled = true;
         message();
@@ -174,21 +185,21 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
         catch (error) { message(authError(error), true); }
         finally { authPending = false; el(buttonId).disabled = false; render(); }
     }
-    el('refreshCloud').addEventListener('click', () => runAccountAction('refreshCloud', async () => { await onRefresh(); status.textContent = 'Biblioteka konta jest aktualna'; }, 'Wczytano aktualną bibliotekę.'));
-    el('migrateLibrary').addEventListener('click', () => runAccountAction('migrateLibrary', onMigrate, 'Dodano lokalne gry do konta. Lokalna kopia pozostała w tej przeglądarce.'));
+    el('refreshCloud').addEventListener('click', () => runAccountAction('refreshCloud', async () => { await onRefresh(); status.textContent = 'Your account library is up to date'; }, 'Loaded the latest library.'));
+    el('migrateLibrary').addEventListener('click', () => runAccountAction('migrateLibrary', onMigrate, 'Local games added to your account. The local copy is still available in this browser.'));
     el('signOut').addEventListener('click', () => runAccountAction('signOut', async () => {
         const { error } = await client.auth.signOut({ scope: 'local' });
         if (error) throw error;
         await queueIdentity(null, 'SIGNED_OUT');
         setMode('login');
-    }, 'Wylogowano. Wyświetlana jest teraz lokalna biblioteka.'));
+    }, 'You are logged out. Your local library is now displayed.'));
 
     render();
     try {
         client = await connectSupabase(SUPABASE_CONFIG);
         configured = Boolean(client);
         if (!client) { await onUserChange(null, null); render(); return; }
-        status.textContent = 'Sprawdzanie sesji konta…';
+        status.textContent = 'Checking your session…';
         client.auth.onAuthStateChange((event, session) => {
             // No awaited Supabase calls inside its auth lock.
             setTimeout(() => { queueIdentity(session, event).catch(error => message(friendlyError(error), true)); }, 0);
@@ -198,7 +209,7 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
         await queueIdentity(data.session, 'INITIAL_SESSION');
         render();
     } catch (error) {
-        status.textContent = 'Połączenie z kontami jest niedostępne. Spróbuj odświeżyć stronę.';
+        status.textContent = 'Unable to connect to accounts. Please refresh the page and try again.';
         message(authError(error), true);
         render();
         await onUserChange(null, null, error);

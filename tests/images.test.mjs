@@ -69,8 +69,8 @@ test('old built-in cover paths resolve to optimized images without replacing cus
 
 test('invalid, oversized and empty uploads fail before decoding', async () => {
     assert.throws(() => validateCoverFile({ type: 'image/svg+xml', size: 20 }), /JPG/);
-    assert.throws(() => validateCoverFile({ type: 'image/png', size: 0 }), /pusty/);
-    await assert.rejects(prepareCover({ type: 'image/png', size: 10 * 1024 * 1024 + 1 }), /przekracza 10 MB/);
+    assert.throws(() => validateCoverFile({ type: 'image/png', size: 0 }), /empty/);
+    await assert.rejects(prepareCover({ type: 'image/png', size: 10 * 1024 * 1024 + 1 }), /exceeds 10 MB/);
     assert.doesNotThrow(() => validateCoverFile({ type: 'image/png', size: 10 * 1024 * 1024 }));
 });
 

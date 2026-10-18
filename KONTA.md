@@ -69,7 +69,7 @@ npm run dev
 ```
 
 Otwórz `http://localhost:5173`, odśwież stronę, wybierz **Zaloguj się → Rejestracja**.
-Wpisz własny adres i nowe, unikalne hasło (co najmniej 10 znaków), potwierdź
+Wpisz własny adres i nowe, unikalne hasło (co najmniej 9 znaków, bez obowiązkowych znaków specjalnych), potwierdź
 e-mail, a potem zaloguj się. Hasła wpisuj wyłącznie samodzielnie w formularzu,
 nie przesyłaj ich na czacie.
 

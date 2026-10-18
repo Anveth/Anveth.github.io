@@ -44,7 +44,7 @@ html = html.replace(/<a class="gallery-item"[^>]*><img[^>]*>(<span>.*?<\/span>)<
     const source = tag.match(/data-original="([^"]+)"/)?.[1] || tag.match(/href="([^"]+)"/)?.[1];
     const asset = manifest[source];
     if (!asset) throw new Error(`Brak grafiki ${source}`);
-    const label = tag.match(/aria-label="([^"]+)"/)[1].replace(/, (?:otwórz w nowej karcie|powiększ na stronie)$/, ', powiększ na stronie');
+    const label = tag.match(/aria-label="([^"]+)"/)[1].replace(/, (?:otwórz w nowej karcie|powiększ na stronie|view full size)$/, ', view full size').replace(/ — kadr (\d+)/, ' — screenshot $1');
     const alt = tag.match(/alt="([^"]+)"/)[1];
     const first = asset.sizes[0];
     const srcset = asset.sizes.map(size => `${size.src} ${size.width}w`).join(', ');

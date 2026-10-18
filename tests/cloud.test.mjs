@@ -31,15 +31,15 @@ test('adapter fixes owner, tracks confirmed revisions, and maps private image pa
     assert.equal(calls[1].payload.p_revision, 3);
     assert.equal(calls[1].payload.p_games[0].coverPath, `${owner}/cover.webp`);
     assert.equal(Object.hasOwn(calls[1].payload.p_games[0], 'imageKey'), false);
-    await assert.rejects(store.save(games), /innym urządzeniu/);
+    await assert.rejects(store.save(games), /another device/);
     await store.save(games);
     assert.equal(calls[3].payload.p_revision, 4); // Failure must not advance revision.
 });
 
 test('foreign cover paths and path traversal are rejected', async () => {
     const store = createCloudStore({ rpc: async () => ({ data: { revision: 0, games: [{ coverPath: 'user-b/cover.webp' }] } }) }, owner, value => value);
-    await assert.rejects(store.load(), /ścieżka/);
-    await assert.rejects(store.save([{ imageKey: '../other' }]), /identyfikator/);
+    await assert.rejects(store.load(), /path/);
+    await assert.rejects(store.save([{ imageKey: '../other' }]), /identifier/);
 });
 
 test('cloud covers are uploaded without upsert in the owner folder', async () => {
@@ -57,7 +57,20 @@ test('cloud covers are uploaded without upsert in the owner folder', async () =>
 });
 
 test('network/session errors do not imply a successful save', () => {
-    assert.match(friendlyError({ message: 'Failed to fetch' }), /nie została zapisana/);
-    assert.match(friendlyError({ code: 'PGRST301' }), /Sesja wygasła/);
+    assert.match(friendlyError({ message: 'Failed to fetch' }), /not saved/);
+    assert.match(friendlyError({ code: 'PGRST301' }), /session has expired/);
     assert.match(friendlyError({ code: 'PGRST202' }), /schema.sql/);
+});
+
+test('deleting a cover is limited to its owner folder and reports storage failures', async () => {
+    const calls = [];
+    const store = createCloudStore({ storage: { from: bucket => ({ remove: async paths => {
+        calls.push({ bucket, paths });
+        return paths[0].includes('failing') ? { error: { message: 'Failed to fetch' } } : { data: [] };
+    } }) } }, owner, value => value);
+    await store.cover('delete', 'old-cover');
+    assert.deepEqual(calls[0], { bucket: 'game-covers', paths: [`${owner}/old-cover.webp`] });
+    await assert.rejects(store.cover('delete', '../other'), /identifier/);
+    await assert.rejects(store.cover('delete', 'failing'), /not saved/);
+    assert.equal(calls.length, 2);
 });

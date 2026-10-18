@@ -113,3 +113,22 @@ test('covers bucket is private and its RLS isolates user folders', async () => {
         assert.equal((await db.query('delete from storage.objects returning *')).rows.length, 0);
     });
 });
+
+test('entry deletion keeps its game; game deletion removes its journal without touching another account', async () => {
+    await asUser(alice, async () => {
+        let current = await load(alice);
+        const secondEntry = { ...fixture.notes[0], id: 'session-2', text: 'Keep this entry' };
+        let revision = await save(alice, [{ ...fixture, notes: [...fixture.notes, secondEntry] }], current.revision);
+        revision = await save(alice, [{ ...fixture, notes: [secondEntry] }], revision);
+        current = await load(alice);
+        assert.equal(current.games.length, 1);
+        assert.equal(current.games[0].id, fixture.id);
+        assert.deepEqual(current.games[0].notes.map(note => note.id), ['session-2']);
+        await assert.rejects(save(alice, [], revision - 1), /LIBRARY_CONFLICT/);
+        assert.equal((await load(alice)).games.length, 1);
+        await save(alice, [], revision);
+        assert.deepEqual((await load(alice)).games, []);
+        assert.equal((await db.query('select * from public.gamelogs_entries')).rows.length, 0);
+    });
+    assert.equal((await asUser(bob, () => load(bob))).games.length, 1);
+});

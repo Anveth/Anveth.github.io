@@ -1,50 +1,50 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="GameLogs — wylosuj następną grę z biblioteki.">
-    <title>GameLogs — losuj grę</title>
-    <link rel="stylesheet" href="style.css?v=20261016-7">
+    <meta name="description" content="GameLogs — pick your next game from your library.">
+    <title>GameLogs — pick a game</title>
+    <link rel="stylesheet" href="style.css?v=20261018-6">
     <link rel="icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js?v=20261016-7"></script>
+    <script type="module" src="script.js?v=20261018-2"></script>
 </head>
 <body data-page="dice">
     <header class="site-header">
         <div class="nav-shell">
-            <a class="brand" href="index.html" aria-label="GameLogs — strona główna">game<span>logs</span></a>
-            <nav class="primary-nav" aria-label="Główna nawigacja">
-                <a href="index.html#biblioteka">Biblioteka</a>
-                <a href="index.html#dziennik">Dziennik</a>
-                <a class="is-active" href="dice.html">Losuj grę</a>
+            <a class="brand" href="index.html" aria-label="GameLogs — home">Game<span>Logs</span></a>
+            <nav class="primary-nav" aria-label="Main navigation">
+                <a href="index.html#library">Library</a>
+                <a href="index.html#journal">Journal</a>
+                <a class="is-active" href="dice.html">Pick a game</a>
             </nav>
-            <div class="header-actions"><button class="button button-secondary account-button" id="accountButton" type="button">Zaloguj się</button><button class="icon-button" id="themeToggle" type="button" aria-label="Włącz jasny motyw" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button></div>
+            <div class="header-actions"><button class="button button-secondary account-button" id="accountButton" type="button">Log in</button><button class="icon-button" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button></div>
         </div>
     </header>
-    <aside class="account-status page-width"><p id="accountStatus" role="status">Tryb lokalny · dane zapisane w tej przeglądarce</p></aside>
+    <aside class="account-status page-width"><p id="accountStatus" role="status">Local mode · saved in this browser</p></aside>
     <main class="dice-page page-width">
         <section class="dice-intro" aria-labelledby="diceTitle">
-            <p class="eyebrow">Decyzja na dziś</p>
-            <h1 id="diceTitle">Nie wiesz, w co zagrać?</h1>
-            <p>Kość wylosuje jedną grę z Twojej biblioteki. Wybierz źródło i daj się zaskoczyć.</p>
+            <p class="eyebrow">Your next adventure</p>
+            <h1 id="diceTitle">Not sure what to play?</h1>
+            <p>The dice will pick a game from your library. Choose a list and let chance decide.</p>
         </section>
-        <section class="dice-panel" aria-label="Generator losowej gry">
+        <section class="dice-panel" aria-label="Random game picker">
             <div class="dice-face" id="diceFace" aria-hidden="true">⚄</div>
-            <label class="dice-source">Losuj z
+            <label class="dice-source">Pick from
                 <select id="diceSource">
-                    <option value="backlog">backlogu</option>
-                    <option value="all">całej biblioteki</option>
-                    <option value="playing">gier, w które gram</option>
+                    <option value="backlog">Want to play</option>
+                    <option value="all">Entire library</option>
+                    <option value="playing">Currently playing</option>
                 </select>
             </label>
-            <button class="button button-primary dice-button" id="rollButton" type="button">Rzuć kością</button>
-            <p class="dice-message" id="diceMessage" aria-live="polite">Wybierz źródło i wylosuj następną historię.</p>
+            <button class="button button-primary dice-button" id="rollButton" type="button">Roll the dice</button>
+            <p class="dice-message" id="diceMessage" aria-live="polite">Choose a list and roll for your next story.</p>
             <article class="random-result" id="randomResult" hidden></article>
         </section>
     </main>
-    <footer class="site-footer"><p>GameLogs <span>·</span> Twój dziennik gier</p></footer>
+    <footer class="site-footer"><p>GameLogs <span>·</span> Your gaming journal</p></footer>
 </body>
 </html>

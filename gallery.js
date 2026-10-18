@@ -17,9 +17,9 @@ export function setupGallery() {
     lightbox.className = 'gallery-lightbox';
     lightbox.setAttribute('aria-labelledby', 'lightboxTitle');
     lightbox.innerHTML = `<div class="lightbox-shell">
-        <div class="lightbox-heading"><div><p class="eyebrow">Kadry z gier</p><h2 id="lightboxTitle"></h2></div><button class="close-button" type="button" aria-label="Zamknij powiększenie">×</button></div>
+        <div class="lightbox-heading"><div><p class="eyebrow">In-game moments</p><h2 id="lightboxTitle"></h2></div><button class="close-button" type="button" aria-label="Close image">×</button></div>
         <div class="lightbox-stage" aria-busy="false"><p class="lightbox-message" role="status"></p><img alt="" decoding="async" hidden></div>
-        <div class="lightbox-footer"><p class="lightbox-count" aria-live="polite"></p><div class="gallery-controls"><button class="icon-button gallery-arrow lightbox-previous" type="button" aria-label="Poprzednie zdjęcie">←</button><button class="icon-button gallery-arrow lightbox-next" type="button" aria-label="Następne zdjęcie">→</button></div><p class="lightbox-hint">← → zmiana zdjęcia · Esc zamyka</p></div>
+        <div class="lightbox-footer"><p class="lightbox-count" aria-live="polite"></p><div class="gallery-controls"><button class="icon-button gallery-arrow lightbox-previous" type="button" aria-label="Previous image">←</button><button class="icon-button gallery-arrow lightbox-next" type="button" aria-label="Next image">→</button></div><p class="lightbox-hint">← → change image · Esc to close</p></div>
     </div>`;
     document.body.append(lightbox);
     const fullImage = lightbox.querySelector('img');
@@ -39,7 +39,7 @@ export function setupGallery() {
         lightbox.querySelector('.lightbox-count').textContent = `${activePhoto + 1} / ${items.length}`;
         previousPhoto.disabled = activePhoto === 0;
         nextPhoto.disabled = activePhoto === items.length - 1;
-        message.textContent = 'Ładowanie zdjęcia…';
+        message.textContent = 'Loading image…';
         message.hidden = false;
         fullImage.hidden = true;
         stage.setAttribute('aria-busy', 'true');
@@ -53,7 +53,7 @@ export function setupGallery() {
     });
     fullImage.addEventListener('error', () => {
         message.hidden = false;
-        message.textContent = 'Nie udało się wczytać zdjęcia. Sprawdź połączenie i spróbuj ponownie.';
+        message.textContent = 'Unable to load the image. Check your connection and try again.';
         stage.setAttribute('aria-busy', 'false');
     });
     lightbox.querySelector('.close-button').addEventListener('click', () => lightbox.close());
@@ -86,7 +86,7 @@ export function setupGallery() {
         const first = items.indexOf(visible[0]) + 1;
         const last = items.indexOf(visible.at(-1)) + 1;
         counter.textContent = `${first || 1}–${last || items.length} / ${items.length}`;
-        progress.setAttribute('aria-valuetext', `Kadry ${first || 1} do ${last || items.length} z ${items.length}`);
+        progress.setAttribute('aria-valuetext', `Screenshots ${first || 1} to ${last || items.length} of ${items.length}`);
     }
 
     function move(direction) {

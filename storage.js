@@ -1,7 +1,7 @@
-import { DEFAULT_GAMES } from './games.js?v=20261016-7';
-import { IMAGE_ASSETS } from './image-assets.js?v=20261016-7';
+import { DEFAULT_GAMES } from './games.js?v=20261018-2';
+import { IMAGE_ASSETS } from './image-assets.js?v=20261018-2';
 
-export const STATUSES = { backlog: 'Backlog', playing: 'Gram', completed: 'Ukończone' };
+export const STATUSES = { backlog: 'Want to play', playing: 'Playing', completed: 'Completed' };
 const LIBRARY_KEY = 'gamelogs:library';
 let database;
 
@@ -15,11 +15,11 @@ export function safeImage(value = '') {
 
 export function normalizeGame(value) {
     if (!value || typeof value.id !== 'string' || typeof value.title !== 'string' || !value.title.trim() || !Object.hasOwn(STATUSES, value.status)) {
-        throw new Error('Plik zawiera nieprawidłową grę.');
+        throw new Error('This file contains an invalid game.');
     }
     const rating = value.rating == null || value.rating === '' ? null : Number(value.rating);
     const notes = (Array.isArray(value.notes) ? value.notes : []).map(note => {
-        if (!note || typeof note.text !== 'string' || !note.text.trim() || !validDate(note.date)) throw new Error('Nieprawidłowy wpis w dzienniku.');
+        if (!note || typeof note.text !== 'string' || !note.text.trim() || !validDate(note.date)) throw new Error('Invalid journal entry.');
         return {
             id: typeof note.id === 'string' ? note.id : crypto.randomUUID(),
             text: note.text.trim().slice(0, 5000), date: note.date,
@@ -50,7 +50,7 @@ export function loadLibrary() {
     const raw = localStorage.getItem(LIBRARY_KEY);
     if (raw === null) return DEFAULT_GAMES.map(normalizeGame);
     const saved = JSON.parse(raw);
-    if (!Array.isArray(saved)) throw new Error('Nie udało się odczytać zapisanej biblioteki.');
+    if (!Array.isArray(saved)) throw new Error('Unable to read your saved library.');
     // Retire only the untouched demo tile, never a user's journal or cloud library.
     return saved.map(normalizeGame).filter(game => !(game.id === 'walking-dead'
         && game.title === 'The Walking Dead' && game.platform === 'PC' && game.year === 2012
@@ -60,7 +60,18 @@ export function loadLibrary() {
 
 export function saveLibrary(games) {
     try { localStorage.setItem(LIBRARY_KEY, JSON.stringify(games)); }
-    catch { throw new Error('Nie udało się zapisać zmian. Sprawdź wolne miejsce lub uprawnienia przeglądarki. Wyeksportuj bibliotekę przed czyszczeniem jej danych.'); }
+    catch { throw new Error('Unable to save changes. Check available storage and browser permissions. Export your library before clearing browser data.'); }
+}
+
+export function removeGame(games, gameId) {
+    if (!games.some(game => game.id === gameId)) throw new Error('This game is no longer in your library.');
+    return games.filter(game => game.id !== gameId);
+}
+
+export function removeEntry(games, gameId, entryId) {
+    const game = games.find(item => item.id === gameId);
+    if (!game?.notes.some(note => note.id === entryId)) throw new Error('This journal entry is no longer available.');
+    return games.map(item => item.id === gameId ? { ...item, notes: item.notes.filter(note => note.id !== entryId) } : item);
 }
 
 async function openDatabase() {
@@ -68,7 +79,7 @@ async function openDatabase() {
         const request = indexedDB.open('gamelogs-media', 1);
         request.onupgradeneeded = () => request.result.createObjectStore('covers');
         request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(new Error('Przeglądarka nie udostępnia miejsca na okładki. Użyj adresu obrazka lub sprawdź ustawienia przechowywania danych.'));
+        request.onerror = () => reject(new Error('Cover storage is unavailable. Use an image URL or check your browser storage settings.'));
     });
     return database;
 }
@@ -78,16 +89,16 @@ export async function coverStore(action, key, blob) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction('covers', action === 'get' ? 'readonly' : 'readwrite');
         const store = transaction.objectStore('covers');
-        const request = action === 'get' ? store.get(key) : store.put(blob, key);
+        const request = action === 'get' ? store.get(key) : action === 'delete' ? store.delete(key) : store.put(blob, key);
         transaction.oncomplete = () => resolve(request.result);
-        transaction.onerror = transaction.onabort = () => reject(new Error('Nie udało się zapisać okładki. Spróbuj mniejszego pliku.'));
+        transaction.onerror = transaction.onabort = () => reject(new Error('Unable to save the cover. Try a smaller file.'));
     });
 }
 
 export function validateCoverFile(file) {
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Wybierz obraz JPG, PNG lub WebP.');
-    if (!file.size) throw new Error('Wybrany plik jest pusty. Wybierz inny obraz.');
-    if (file.size > 10 * 1024 * 1024) throw new Error('Plik przekracza 10 MB i nie zostanie dodany. Wybierz mniejszy obraz — dopuszczalny plik pomniejszymy automatycznie.');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Choose a JPG, PNG or WebP image.');
+    if (!file.size) throw new Error('The selected file is empty. Choose another image.');
+    if (file.size > 10 * 1024 * 1024) throw new Error('This file exceeds 10 MB and cannot be added. Choose a smaller image — accepted uploads are resized automatically.');
 }
 
 export async function prepareCover(file) {
@@ -97,22 +108,22 @@ export async function prepareCover(file) {
         const image = new Image();
         image.src = url;
         try { await image.decode(); }
-        catch { throw new Error('Nie można odczytać tego obrazu. Wybierz inny plik JPG, PNG lub WebP.'); }
-        if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth * image.naturalHeight > 40000000) throw new Error('Obraz ma zbyt dużą rozdzielczość. Wybierz zdjęcie do 40 megapikseli.');
+        catch { throw new Error('Unable to read this image. Choose another JPG, PNG or WebP file.'); }
+        if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth * image.naturalHeight > 40000000) throw new Error('This image is too large. Choose an image up to 40 megapixels.');
         const scale = Math.min(1, 1200 / Math.max(image.naturalWidth, image.naturalHeight));
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
         canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
         const context = canvas.getContext('2d');
-        if (!context) throw new Error('Przeglądarka nie pozwala przygotować okładki. Spróbuj w nowszej przeglądarce.');
+        if (!context) throw new Error('Unable to prepare the cover in this browser. Try an updated browser.');
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
         let result;
         for (const quality of [.84, .76, .68, .6]) {
-            result = await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Nie udało się przygotować obrazu.')), 'image/webp', quality));
-            if (result.type !== 'image/webp') throw new Error('Ta przeglądarka nie obsługuje zapisu WebP. Zaktualizuj ją lub wybierz inną.');
+            result = await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Unable to prepare the image.')), 'image/webp', quality));
+            if (result.type !== 'image/webp') throw new Error('This browser cannot save WebP images. Update it or use another browser.');
             if (result.size <= 300 * 1024) break;
         }
-        if (result.size > 512 * 1024) throw new Error('Nawet po kompresji okładka przekracza 512 KB. Wybierz mniej szczegółowy lub mniejszy obraz.');
+        if (result.size > 512 * 1024) throw new Error('This cover still exceeds 512 KB after compression. Choose a smaller or less detailed image.');
         return result;
     }
     finally { URL.revokeObjectURL(url); }
@@ -122,15 +133,15 @@ export function blobToDataUrl(blob) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error('Nie udało się odczytać okładki.'));
+        reader.onerror = () => reject(new Error('Unable to read the cover.'));
         reader.readAsDataURL(blob);
     });
 }
 
 export function dataUrlToBlob(value) {
-    if (typeof value !== 'string' || !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(value)) throw new Error('Nieprawidłowa okładka w kopii biblioteki.');
+    if (typeof value !== 'string' || !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(value)) throw new Error('Invalid cover in this library backup.');
     const [header, encoded] = value.split(',');
     const bytes = Uint8Array.from(atob(encoded), character => character.charCodeAt(0));
-    if (bytes.length > 10 * 1024 * 1024) throw new Error('Okładka w kopii jest za duża.');
+    if (bytes.length > 10 * 1024 * 1024) throw new Error('A cover in this backup is too large.');
     return new Blob([bytes], { type: header.slice(5, header.indexOf(';')) });
 }
