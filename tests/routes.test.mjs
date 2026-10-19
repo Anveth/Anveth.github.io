@@ -74,7 +74,7 @@ test('preview server serves clean routes, redirects the missing slash and protec
         });
     });
     const origin = `http://127.0.0.1:${port}`;
-    for (const path of ['/', '/index.html', '/pick-a-game/', '/pick-a-game/index.html', '/dice.html', '/routes.js', '/cover-loader.js', '/images/optimized/covers/Dishonored-640.webp']) {
+    for (const path of ['/', '/index.html', '/pick-a-game/', '/pick-a-game/index.html', '/dice.html', '/routes.js', '/cover-loader.js', '/gallery-demo.js', '/personal-gallery.js', '/screenshots.js', '/images/optimized/covers/Dishonored-640.webp']) {
         const response = await fetch(origin + path);
         assert.equal(response.status, 200, path);
         assert.equal(response.headers.get('cache-control'), 'no-store');

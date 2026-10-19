@@ -132,3 +132,20 @@ Testy `npm test` uruchamiają PostgreSQL w pamięci (PGlite), bez kont użytkown
 i bez połączenia z produkcją. Sprawdzają izolację RLS, prywatne ścieżki okładek,
 atomowy zapis i konflikty wersji. Nie zastępują końcowego testu rejestracji,
 potwierdzenia e-maila oraz logowania na dwóch urządzeniach.
+
+## Prywatna galeria screenshotów
+
+Rozszerzenie galerii wymaga `supabase/gallery.sql` (skrypt addytywny i powtarzalny).
+Tworzy `gamelogs_screenshots` z RLS właściciela i prywatny bucket `game-screenshots`.
+Anonimowi użytkownicy nie mają dostępu. Nie zmienia istniejących gier, wpisów ani Auth.
+Frontend używa publicznego klucza i sesji użytkownika; nie dodawaj service_role.
+Zdjęcia wyświetlane są przez podpisane URL-e ważne godzinę, odnawiane podczas korzystania.
+Usuwanie wymaga potwierdzenia. Po usunięciu metadanych nieudane czyszczenie pliku
+jest zgłaszane osobno — nie jako nieudane usunięcie wpisu z galerii.
+Bez logowania widać galerię demonstracyjną; po zalogowaniu wyłącznie prywatne zdjęcia
+właściciela lub puste kafelki dodawania. Każde własne zdjęcie ma kosz, bez przycisku Refresh.
+Starsze lokalne zdjęcia (IndexedDB) pozostają nienaruszone, osobno od konta i eksportu.
+
+Kontrola bezpieczeństwa projektu po dodaniu galerii: RLS i uprawnienia poprawne;
+pozostało wcześniejsze ostrzeżenie Auth „Leaked Password Protection Disabled”.
+Nie zmieniono polityki haseł ani ustawień kont.

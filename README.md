@@ -101,12 +101,31 @@ Okładka Cyberpunk 2077 pochodzi z [zasobów Steam](https://shared.fastly.steams
 
 ## Lżejsze grafiki i większa galeria
 
-Na komputerze galeria pokazuje dwa kadry 16:9, na telefonie jeden i fragment
-następnego. Kliknięcie otwiera powiększenie na stronie; działają strzałki,
-klawiatura, Esc oraz kliknięcie poza oknem. Zdjęcie w powiększeniu nie jest
-przycinane. Przy wyłączonym JavaScript link prowadzi bezpośrednio do pliku WebP.
+Nowa biblioteka zaczyna się pusta, z kafelkiem „Add your first game”. Zapisane wcześniej
+gry i wpisy pozostają bez zmian. Player journal pokazuje cztery wpisy w dwóch kolumnach;
+„Show more” odsłania kolejne (na telefonie jedna kolumna).
 
-33 wbudowane grafiki (15 okładek i 18 kadrów) mają zoptymalizowane wersje
+Bez logowania galeria pokazuje dotychczasowe 18 zoptymalizowanych zdjęć demonstracyjnych.
+Nie ma w niej przycisków dodawania, usuwania ani Refresh. Po zalogowaniu galeria jest
+osobista: dwa puste miejsca „Add your favourite screenshots”, przycisk Add screenshot,
+podpis do 100 znaków i osobny kosz przy każdym własnym zdjęciu (z potwierdzeniem).
+Przykładowe zdjęcia nie są kopiowane na konto. JPG/PNG/WebP do 10 MB i 40 megapikseli
+są konwertowane w przeglądarce do WebP, do 1920 px i 1 MB. Interfejs pozwala dodać
+do 100 zdjęć; limit rozmiaru pojedynczego pliku obowiązuje także w Supabase Storage.
+Zdjęcia konta są przechowywane w prywatnym bucket `game-screenshots`,
+a podpisy w tabeli `gamelogs_screenshots`. Adresy zdjęć odnawiają się automatycznie.
+W nowym projekcie Supabase uruchom także `supabase/gallery.sql`.
+Zdjęcia zapisane lokalnie w poprzedniej wersji pozostają w IndexedDB, lecz widok gościa
+ich teraz nie wyświetla i nie przenosi automatycznie na konto. Export/Import biblioteki
+nadal obejmuje gry, okładki i wpisy — nie jest kopią zapasową osobnej galerii.
+Usunięcie gry nie usuwa screenshotów. Oryginalne demo plików w images/ pozostaje w repo.
+
+Na komputerze galeria pokazuje dwa kadry 16:9, na telefonie jeden pełnej
+szerokości obszaru treści. Kliknięcie otwiera powiększenie na stronie; działają strzałki,
+klawiatura, Esc oraz kliknięcie poza oknem. Zdjęcie w powiększeniu nie jest
+przycinane. Dodawanie i wyświetlanie prywatnej galerii wymaga JavaScript.
+
+33 archiwalne grafiki demonstracyjne (15 okładek i 18 kadrów) mają zoptymalizowane wersje
 w `images/optimized/`. Oryginały są zachowane. Galeria ma warianty szerokości
 do 640, 1280 i 1920 px, bez powiększania mniejszych oryginałów. `srcset` dobiera
 plik do ekranu, `loading="lazy"` odracza pobieranie galerii poniżej ekranu.

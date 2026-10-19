@@ -6,12 +6,12 @@
     <base href="/">
     <meta name="description" content="GameLogs — pick your next game from your library.">
     <title>GameLogs — pick a game</title>
-    <link rel="stylesheet" href="style.css?v=20261018-21">
+    <link rel="stylesheet" href="style.css?v=20261019-19">
     <link rel="icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js?v=20261018-9"></script>
+    <script type="module" src="script.js?v=20261019-6"></script>
 </head>
 <body data-page="dice">
     <header class="site-header">
@@ -25,12 +25,10 @@
             <div class="header-actions"><button class="button button-secondary account-button" id="accountButton" type="button">Log in</button><button class="icon-button" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button></div>
         </div>
     </header>
-    <aside class="account-status page-width"><p id="accountStatus" role="status">Local mode · saved in this browser</p></aside>
     <main class="dice-page page-width">
         <section class="dice-intro" aria-labelledby="diceTitle">
-            <p class="eyebrow">Your next adventure</p>
             <h1 id="diceTitle">Not sure what to play?</h1>
-            <p>The dice will pick a game from your library. Choose a list and let chance decide.</p>
+            <p><span class="copy-lead">Your next adventure.</span> The dice will pick a game from your library. Choose a list and let chance decide.</p>
         </section>
         <section class="dice-panel" aria-label="Random game picker">
             <div class="dice-controls">
@@ -59,13 +57,12 @@
             <div class="dice-result-area">
                 <article class="random-result" id="randomResult" aria-labelledby="resultTitle" hidden></article>
                 <div class="dice-empty">
-                    <p class="eyebrow">Your next game</p>
                     <h2>One roll, a new story.</h2>
-                    <p>Choose a list and roll to reveal your next game.</p>
+                    <p><span class="copy-lead">Your next game.</span> Choose a list and roll to reveal your next game.</p>
                 </div>
             </div>
         </section>
     </main>
-    <footer class="site-footer"><p>GameLogs <span>·</span> Your gaming journal</p></footer>
+    <footer class="site-footer"><p><span class="footer-brand">Game<span class="footer-brand-accent">Logs</span></span><span class="footer-tagline">Your <span class="footer-gaming">gaming</span> journal</span></p></footer>
 </body>
 </html>

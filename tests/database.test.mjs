@@ -8,6 +8,7 @@ const db = new PGlite();
 const alice = '10000000-0000-4000-8000-000000000001';
 const bob = '20000000-0000-4000-8000-000000000002';
 const schema = await readFile(new URL('../supabase/schema.sql', import.meta.url), 'utf8');
+const gallerySchema = await readFile(new URL('../supabase/gallery.sql', import.meta.url), 'utf8');
 const fixture = {
     id: 'witcher', title: 'Wiedźmin 3', platform: 'PC', year: 2015,
     status: 'completed', rating: 9, image: '', coverPath: '',
@@ -34,8 +35,38 @@ before(async () => {
     `);
     await db.exec(schema);
     await db.exec(schema); // Setup is safely repeatable.
+    await db.exec(gallerySchema);
+    await db.exec(gallerySchema);
 });
 after(() => db.close());
+
+test('screenshots start empty and their metadata and private files are isolated by account', async () => {
+    const id = '30000000-0000-4000-8000-000000000003';
+    await asUser(alice, async () => {
+        assert.equal((await db.query('select * from gamelogs_screenshots')).rows.length, 0);
+        await db.query('insert into gamelogs_screenshots(user_id,id,caption) values ($1,$2,$3)', [alice, id, 'Favourite moment']);
+        await db.query('insert into storage.objects(bucket_id,name) values ($1,$2)', ['game-screenshots', `${alice}/${id}.webp`]);
+    });
+    await asUser(bob, async () => {
+        assert.equal((await db.query('select * from gamelogs_screenshots')).rows.length, 0);
+        assert.equal((await db.query("select * from storage.objects where bucket_id='game-screenshots'")).rows.length, 0);
+        await assert.rejects(db.query('insert into gamelogs_screenshots(user_id,id,caption) values ($1,$2,$3)', [alice, id, 'Foreign']), /row-level security/);
+        await assert.rejects(db.query('insert into storage.objects(bucket_id,name) values ($1,$2)', ['game-screenshots', `${alice}/other.webp`]), /row-level security/);
+        assert.equal((await db.query('delete from gamelogs_screenshots where user_id=$1 returning id', [alice])).rows.length, 0);
+    });
+    await db.exec('set role anon');
+    try { await assert.rejects(db.query('select * from gamelogs_screenshots'), /permission denied/); }
+    finally { await db.exec('reset role'); }
+    await asUser(alice, async () => {
+        assert.equal((await db.query('select * from gamelogs_screenshots')).rows.length, 1);
+        await db.query('delete from gamelogs_screenshots where id=$1', [id]);
+        await db.query("delete from storage.objects where bucket_id='game-screenshots' and name=$1", [`${alice}/${id}.webp`]);
+    });
+    const bucket = (await db.query("select * from storage.buckets where id='game-screenshots'")).rows[0];
+    assert.equal(bucket.public, false);
+    assert.equal(Number(bucket.file_size_limit), 1048576);
+    assert.deepEqual(bucket.allowed_mime_types, ['image/webp']);
+});
 
 async function asUser(id, action) {
     await db.query("select set_config('request.jwt.claim.sub', $1, false)", [id]);

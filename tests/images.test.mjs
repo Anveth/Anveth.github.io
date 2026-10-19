@@ -44,17 +44,16 @@ test('retired Walking Dead demo disappears, but customizations and diary entries
     } finally { delete globalThis.window; delete globalThis.localStorage; }
 });
 
-test('gallery uses responsive thumbnails and larger full-size files without new-tab targets', async () => {
+test('gallery renders after identity is known, without exposing account-only upload slots in HTML', async () => {
     const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
     const links = [...html.matchAll(/<a class="gallery-item"[^>]*><img[^>]*>/g)];
-    assert.equal(links.length, 18);
-    for (const [tag] of links) {
-        assert.match(tag, /href="images\/optimized\/gallery\/.*\.webp"/);
-        assert.match(tag, /srcset="[^"]+\d+w/);
-        assert.match(tag, /width="\d+" height="\d+"/);
-        assert.match(tag, /loading="lazy"/);
-        assert.doesNotMatch(tag, /target="_blank"/);
-    }
+    assert.equal(links.length, 0);
+    assert.equal((html.match(/class="gallery-upload"/g) || []).length, 0);
+    assert.doesNotMatch(html, /id="refreshGallery"/);
+    const personal = await readFile(new URL('../gallery-demo.js', import.meta.url), 'utf8');
+    assert.match(personal, /loading="lazy" decoding="async"/);
+    assert.match(personal, /width="1920" height="1080"/);
+    assert.doesNotMatch(personal, /target="_blank"/);
 });
 
 test('old built-in cover paths resolve to optimized images without replacing custom URLs', () => {

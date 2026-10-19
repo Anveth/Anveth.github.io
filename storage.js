@@ -1,4 +1,3 @@
-import { DEFAULT_GAMES } from './games.js?v=20261018-2';
 import { IMAGE_ASSETS } from './image-assets.js?v=20261018-2';
 
 export const STATUSES = { backlog: 'Want to play', playing: 'Playing', completed: 'Completed' };
@@ -48,7 +47,7 @@ export function validDate(value) {
 
 export function loadLibrary() {
     const raw = localStorage.getItem(LIBRARY_KEY);
-    if (raw === null) return DEFAULT_GAMES.map(normalizeGame);
+    if (raw === null) return [];
     const saved = JSON.parse(raw);
     if (!Array.isArray(saved)) throw new Error('Unable to read your saved library.');
     // Retire only the untouched demo tile, never a user's journal or cloud library.
@@ -101,7 +100,7 @@ export function validateCoverFile(file) {
     if (file.size > 10 * 1024 * 1024) throw new Error('This file exceeds 10 MB and cannot be added. Choose a smaller image — accepted uploads are resized automatically.');
 }
 
-export async function prepareCover(file) {
+export async function prepareCover(file, { maxDimension = 1200, maxBytes = 512 * 1024, targetBytes = 300 * 1024 } = {}) {
     validateCoverFile(file);
     const url = URL.createObjectURL(file);
     try {
@@ -110,7 +109,7 @@ export async function prepareCover(file) {
         try { await image.decode(); }
         catch { throw new Error('Unable to read this image. Choose another JPG, PNG or WebP file.'); }
         if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth * image.naturalHeight > 40000000) throw new Error('This image is too large. Choose an image up to 40 megapixels.');
-        const scale = Math.min(1, 1200 / Math.max(image.naturalWidth, image.naturalHeight));
+        const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
         canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -121,9 +120,9 @@ export async function prepareCover(file) {
         for (const quality of [.84, .76, .68, .6]) {
             result = await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Unable to prepare the image.')), 'image/webp', quality));
             if (result.type !== 'image/webp') throw new Error('This browser cannot save WebP images. Update it or use another browser.');
-            if (result.size <= 300 * 1024) break;
+            if (result.size <= targetBytes) break;
         }
-        if (result.size > 512 * 1024) throw new Error('This cover still exceeds 512 KB after compression. Choose a smaller or less detailed image.');
+        if (result.size > maxBytes) throw new Error(`This image still exceeds ${Math.round(maxBytes / 1024)} KB after compression. Choose a smaller or less detailed image.`);
         return result;
     }
     finally { URL.revokeObjectURL(url); }

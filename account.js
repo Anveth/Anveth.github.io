@@ -20,14 +20,14 @@ const authError = error => ({
 
 export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigrate, isBusy }) {
     const button = document.getElementById('accountButton');
-    const status = document.getElementById('accountStatus');
     const dialog = document.createElement('dialog');
     dialog.className = 'game-dialog account-dialog';
     dialog.id = 'accountDialog';
     dialog.setAttribute('aria-labelledby', 'accountTitle');
     dialog.innerHTML = `<div class="detail-content">
-        <div class="dialog-heading"><div><p class="eyebrow">Your space</p><h2 id="accountTitle">Log in</h2></div><button class="close-button" id="closeAccount" type="button" aria-label="Close account">×</button></div>
+        <div class="dialog-heading"><div><h2 id="accountTitle">Log in</h2><p class="dialog-caption">Your space</p></div><button class="close-button" id="closeAccount" type="button" aria-label="Close account">×</button></div>
         <p id="accountDescription">Your games and notes, on every device.</p>
+        <p class="account-save-status" id="accountStatus" role="status">Saved in this browser.</p>
         <div class="account-tabs" id="accountTabs"><button type="button" class="filter-button" data-auth-mode="login">Log in</button><button type="button" class="filter-button" data-auth-mode="signup">Sign up</button></div>
         <form id="authForm" class="auth-form">
             <label id="emailLabel">Email<input id="authEmail" name="email" type="email" autocomplete="email" required maxlength="254"></label>
@@ -46,6 +46,7 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
     </div>`;
     document.body.append(dialog);
     const el = id => document.getElementById(id);
+    const status = el('accountStatus');
     let client = null;
     let user = null;
     let configured = false;
@@ -117,10 +118,10 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
             lastOwner = nextOwner;
             user = nextUser;
             render();
-            status.textContent = user ? 'Loading your private library…' : 'Local mode · saved in this browser';
+            status.textContent = user ? 'Loading your private library…' : 'Saved in this browser.';
             try {
                 await onUserChange(user, client);
-                status.textContent = user ? 'Account library · changes are saved to the server' : 'Local mode · log in to save to your account';
+                status.textContent = user ? 'Account library · changes are saved to the server' : 'Your library is saved in this browser.';
             } catch (error) {
                 status.textContent = 'Unable to load your account library. Open My account and try refreshing it.';
                 message(friendlyError(error), true);

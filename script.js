@@ -1,7 +1,7 @@
-import { setupGallery } from './gallery.js?v=20261018-2';
-import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, removeGame, removeEntry, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261018-2';
+import { setupPersonalGallery } from './personal-gallery.js?v=20261019-2';
+import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, removeGame, removeEntry, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261019-1';
 import { createCloudStore } from './cloud.js?v=20261018-2';
-import { mountAccount } from './account.js?v=20261018-3';
+import { mountAccount } from './account.js?v=20261019-2';
 import { cleanPageURL } from './routes.js?v=20261018-1';
 import { preloadCover } from './cover-loader.js?v=20261018-1';
 import { SUPABASE_CONFIG } from './config.js?v=20261018-2';
@@ -13,6 +13,8 @@ let library = [];
 let readError = '';
 try { library = loadLibrary(); } catch (error) { readError = error.message; }
 let currentFilter = 'all';
+const JOURNAL_PAGE_SIZE = 4;
+let visibleJournalEntries = JOURNAL_PAGE_SIZE;
 let selectedId = null;
 let editingId = null;
 let stagedCover = null;
@@ -125,7 +127,7 @@ function renderLibrary() {
             <label class="select-label">Status<select class="status-select" data-status-id="${escapeHtml(game.id)}" aria-label="Status for ${escapeHtml(game.title)}">${Object.entries(STATUSES).map(([value, label]) => `<option value="${value}" ${game.status === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
             ${game.status === 'completed' ? `<label class="rating-label">Rating<input class="rating-input" data-rating-id="${escapeHtml(game.id)}" aria-label="Rating for ${escapeHtml(game.title)}" type="number" min="1" max="10" step="1" inputmode="numeric" value="${game.rating ?? ''}" placeholder="—"><span>/ 10</span></label>` : `<p class="status-hint">${game.status === 'playing' ? 'In progress' : 'Ready when you are'}</p>`}
             <button class="text-button diary-link" type="button" data-open-game="${escapeHtml(game.id)}">Journal <span>${game.notes.length ? `(${game.notes.length})` : '↗'}</span></button>
-        </div></article>`).join('') : '<p class="empty-state">No games in this list yet. Try another filter or add a game.</p>';
+        </div></article>`).join('') : library.length ? '<p class="empty-state">No games in this list yet. Try another filter or add a game.</p>' : '<button class="first-game-tile" type="button" data-open-dialog><span class="placeholder-plus" aria-hidden="true">+</span><strong>Add your first game</strong><span>Your library starts here</span></button>';
 }
 
 function noteMarkup(note) {
@@ -203,9 +205,23 @@ function setupDeletion() {
 function renderRecentNotes() {
     const container = byId('recentNotes');
     if (!container) return;
-    const recent = library.flatMap(game => game.notes.map(note => ({ game, note })))
-        .sort((a, b) => b.note.date.localeCompare(a.note.date) || b.note.createdAt.localeCompare(a.note.createdAt)).slice(0, 3);
-    container.innerHTML = recent.length ? recent.map(({ game, note }) => `<article class="journal-note"><button class="journal-game text-button" type="button" data-open-game="${escapeHtml(game.id)}">${escapeHtml(game.title)} <span>· ${STATUSES[game.status]}</span></button><p class="note-text">${escapeHtml(note.text)}</p><p class="journal-meta">${formatDate(note.date)}${note.minutes ? ` · ${note.minutes} min` : ''}</p></article>`).join('') : '<div class="journal-note"><p class="journal-game">Every game has a story.</p><p class="journal-meta">Select a cover or the Journal button below a game to write about your first session.</p></div>';
+    const entries = library.flatMap(game => game.notes.map(note => ({ game, note })))
+        .sort((a, b) => b.note.date.localeCompare(a.note.date) || b.note.createdAt.localeCompare(a.note.createdAt));
+    if (!entries.length) visibleJournalEntries = JOURNAL_PAGE_SIZE;
+    const recent = entries.slice(0, visibleJournalEntries);
+    container.innerHTML = recent.length ? recent.map(({ game, note }) => `<article class="journal-entry"><div class="journal-entry-date"><time datetime="${escapeHtml(note.date)}">${formatDate(note.date)}</time>${note.minutes ? `<span>${note.minutes} min</span>` : ''}</div><div class="journal-entry-body"><button class="journal-game text-button" type="button" data-open-game="${escapeHtml(game.id)}">${escapeHtml(game.title)}</button><p class="entry-status">${STATUSES[game.status]}</p><p class="note-text">${escapeHtml(note.text)}</p></div></article>`).join('') : '<div class="journal-empty"><h3>Every game has a story.</h3><p>Select a cover or the Journal button below a game to write about your first session.</p></div>';
+    byId('journalCount').textContent = entries.length ? `${recent.length} of ${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}` : 'No entries yet';
+    const remaining = entries.length - recent.length;
+    const more = byId('showMoreEntries');
+    more.hidden = remaining === 0;
+    more.textContent = remaining ? `Show more (${Math.min(JOURNAL_PAGE_SIZE, remaining)})` : 'Show more';
+}
+
+function showMoreJournalEntries() {
+    const previousCount = byId('recentNotes').querySelectorAll('.journal-entry').length;
+    visibleJournalEntries += JOURNAL_PAGE_SIZE;
+    renderRecentNotes();
+    byId('recentNotes').querySelectorAll('.journal-game')[previousCount]?.focus({ preventScroll: true });
 }
 
 function renderDetails() {
@@ -263,6 +279,7 @@ function setupLibraryPage() {
     renderLibrary();
     renderRecentNotes();
     if (readError) notify(`Unable to load the library: ${readError} Your data is unchanged. You can restore a backup using Import.`, true);
+    byId('showMoreEntries').addEventListener('click', showMoreJournalEntries);
     document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
         currentFilter = button.dataset.filter;
         document.querySelectorAll('[data-filter]').forEach(item => {
@@ -274,6 +291,7 @@ function setupLibraryPage() {
     document.addEventListener('click', event => {
         const button = event.target.closest('[data-open-game]');
         if (button) openDetails(button.dataset.openGame);
+        if (event.target.closest('[data-open-dialog]')) openGameForm();
     });
     byId('gameGrid').addEventListener('change', async event => {
         const target = event.target;
@@ -290,7 +308,6 @@ function setupLibraryPage() {
             next?.focus({ preventScroll: true });
         } catch (error) { renderLibrary(); notify(error.message, true); }
     });
-    document.querySelectorAll('[data-open-dialog]').forEach(button => button.addEventListener('click', () => openGameForm()));
     document.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => byId('gameDialog').close()));
     document.querySelector('[data-close-detail]').addEventListener('click', () => byId('detailDialog').close());
     byId('editGame').addEventListener('click', () => { byId('detailDialog').close(); openGameForm(selectedId); });
@@ -508,7 +525,7 @@ function setupDicePage() {
             byId('diceFace').classList.remove('is-rolling');
             byId('diceFace').dataset.value = String(1 + Math.floor(Math.random() * 6));
             byId('diceMessage').textContent = `Today’s pick: ${game.title}`;
-            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover', true, coverLoaded)}<div class="result-content"><p class="eyebrow">Today’s pick</p><h2 class="result-title" id="resultTitle">${escapeHtml(game.title)}</h2><p class="result-meta">${escapeHtml(game.platform)}${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button result-journal-link" href="/?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
+            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover', true, coverLoaded)}<div class="result-content"><h2 class="result-title" id="resultTitle">${escapeHtml(game.title)}</h2><p class="result-meta"><span class="result-context">Today’s pick</span> · ${escapeHtml(game.platform)}${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button result-journal-link" href="/?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
             byId('randomResult').hidden = false;
             button.disabled = false;
         }, 550);
@@ -516,7 +533,7 @@ function setupDicePage() {
 }
 
 setupTheme();
-setupGallery();
+const personalGallery = setupPersonalGallery();
 setupLibraryPage();
 setupDicePage();
 // Keep previously shared section links working after the English-only update.
@@ -528,6 +545,7 @@ if (legacySection && byId(legacySection)) {
 
 async function changeIdentity(user, client, connectionError) {
     const epoch = ++scopeEpoch;
+    const galleryReady = personalGallery?.setScope(client, user?.id, connectionError);
     identityPending = true;
     document.querySelector('main').inert = true;
     document.querySelectorAll('dialog:not(#accountDialog)').forEach(dialog => { if (dialog.open) dialog.close(); });
@@ -566,7 +584,7 @@ async function changeIdentity(user, client, connectionError) {
             document.querySelector('main').inert = false;
         }
     }
-    await hydrateCovers();
+    await Promise.all([hydrateCovers(), galleryReady]);
     if (scopeEpoch === epoch) {
         renderLibrary();
         const initialGame = new URLSearchParams(location.search).get('game');

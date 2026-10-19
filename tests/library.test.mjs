@@ -54,11 +54,13 @@ test('the UI is English-only while stored status identifiers and user content st
 
 test('library actions are available above and below the games using the same add-game handler', async () => {
     const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-    const top = html.match(/<div class="hero-actions">([\s\S]*?)<\/div>/)[1];
+    const top = html.match(/<div class="library-primary-actions">([\s\S]*?)<\/div>/)[1];
     const bottom = html.match(/<div class="library-actions"[^>]*>([\s\S]*?)<\/div>/)[1];
     assert.equal(top, bottom);
     assert.match(bottom, /data-open-dialog>Add a game<\/button>/);
     assert.match(bottom, /href="\/pick-a-game\/">Pick from Want to play<\/a>/);
+    assert.ok(html.indexOf('class="library-tools"') < html.indexOf('class="library-primary-actions"'));
+    assert.ok(html.indexOf('class="library-primary-actions"') < html.indexOf('id="gameGrid"'));
     assert.ok(html.indexOf('id="gameGrid"') < html.indexOf('class="library-actions"'));
     assert.ok(html.indexOf('class="library-actions"') < html.indexOf('id="journal"'));
 });
