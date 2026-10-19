@@ -38,6 +38,9 @@ http://127.0.0.1:5173/index.html
 
 Formularze używają strony `index.html` jako celu potwierdzenia rejestracji
 i odzyskiwania hasła. Nie stosuj szerokiego `**` dla produkcji.
+Ten adres pozostaje bez zmian również przy logowaniu z `/pick-a-game/`.
+Po wejściu aplikacja upraszcza widoczny adres do `/`, zachowując parametry
+i fragment z odpowiedzi uwierzytelniania. Nie zmieniamy konfiguracji Supabase.
 
 ## 2. Rejestracja e-mail — ważne ograniczenie
 
@@ -91,7 +94,7 @@ npm ci
 npm run check
 npm test
 git status
-git add index.html dice.html style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js scripts/dev.mjs scripts/optimize-images.mjs images/optimized package.json package-lock.json README.md PUBLIKACJA.md KONTA.md tests supabase
+git add index.html dice.html pick-a-game routes.js cover-loader.js style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js scripts/dev.mjs scripts/optimize-images.mjs images/optimized package.json package-lock.json README.md PUBLIKACJA.md KONTA.md tests supabase
 git diff --cached --stat
 git commit -m "Add private game libraries with Supabase Auth and restore gallery"
 git pull --rebase origin main

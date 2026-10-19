@@ -1,8 +1,13 @@
 import { setupGallery } from './gallery.js?v=20261018-2';
 import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, removeGame, removeEntry, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261018-2';
 import { createCloudStore } from './cloud.js?v=20261018-2';
-import { mountAccount } from './account.js?v=20261018-2';
+import { mountAccount } from './account.js?v=20261018-3';
+import { cleanPageURL } from './routes.js?v=20261018-1';
+import { preloadCover } from './cover-loader.js?v=20261018-1';
 import { SUPABASE_CONFIG } from './config.js?v=20261018-2';
+
+const pageURL = cleanPageURL(location.href);
+if (pageURL.href !== location.href) history.replaceState(history.state, '', pageURL.href);
 
 let library = [];
 let readError = '';
@@ -95,8 +100,8 @@ async function hydrateCovers() {
     }));
 }
 
-function gameCover(game, className = 'game-cover', eager = false) {
-    const image = coverUrls.get(game.imageKey) || safeImage(game.image);
+function gameCover(game, className = 'game-cover', eager = false, showImage = true) {
+    const image = showImage ? coverUrls.get(game.imageKey) || safeImage(game.image) : '';
     return `<div class="${className} cover-placeholder"><span aria-hidden="true">${escapeHtml(game.title.charAt(0).toUpperCase())}</span>${image ? `<img src="${escapeHtml(image)}" alt="Cover for ${escapeHtml(game.title)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async" width="600" height="900">` : ''}</div>`;
 }
 
@@ -490,15 +495,20 @@ function setupDicePage() {
         button.disabled = true;
         byId('diceFace').classList.add('is-rolling');
         byId('diceMessage').textContent = 'Rolling…';
+        const game = games[Math.floor(Math.random() * games.length)];
+        const coverReady = (async () => {
+            await hydrateCovers();
+            if (epoch !== scopeEpoch) return false;
+            return preloadCover(coverUrls.get(game.imageKey) || safeImage(game.image));
+        })();
         setTimeout(async () => {
             if (epoch !== scopeEpoch) return;
-            await hydrateCovers();
+            const coverLoaded = await coverReady;
             if (epoch !== scopeEpoch) return;
-            const game = games[Math.floor(Math.random() * games.length)];
             byId('diceFace').classList.remove('is-rolling');
             byId('diceFace').dataset.value = String(1 + Math.floor(Math.random() * 6));
             byId('diceMessage').textContent = `Today’s pick: ${game.title}`;
-            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover', true)}<div class="result-content"><p class="eyebrow">Today’s pick</p><h2 class="result-title" id="resultTitle">${escapeHtml(game.title)}</h2><p class="result-meta">${escapeHtml(game.platform)}${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button result-journal-link" href="index.html?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
+            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover', true, coverLoaded)}<div class="result-content"><p class="eyebrow">Today’s pick</p><h2 class="result-title" id="resultTitle">${escapeHtml(game.title)}</h2><p class="result-meta">${escapeHtml(game.platform)}${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button result-journal-link" href="/?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
             byId('randomResult').hidden = false;
             button.disabled = false;
         }, 550);

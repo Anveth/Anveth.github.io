@@ -4,7 +4,7 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const port = 5173;
+const port = Number(process.env.GAMELOGS_PORT ?? 5173);
 const projectId = 'gamelogs-v2';
 const types = {
     '.html': 'text/html; charset=utf-8',
@@ -31,11 +31,17 @@ const server = createServer(async (request, response) => {
     }
 
     try {
-        const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-        const relative = pathname === '/' ? 'index.html' : pathname.slice(1);
+        const requestURL = new URL(request.url, 'http://localhost');
+        const pathname = decodeURIComponent(requestURL.pathname);
+        if (pathname === '/pick-a-game') {
+            response.writeHead(308, { Location: `/pick-a-game/${requestURL.search}`, 'Cache-Control': 'no-store' });
+            response.end();
+            return;
+        }
+        const relative = pathname === '/' ? 'index.html' : pathname === '/pick-a-game/' ? 'pick-a-game/index.html' : pathname.slice(1);
         const path = resolve(root, relative);
         const extension = extname(path).toLowerCase();
-        const isPublic = ['index.html', 'dice.html', 'style.css', 'script.js', 'games.js', 'storage.js', 'image-assets.js', 'account.js', 'gallery.js', 'cloud.js', 'config.js', 'favicon.ico'].includes(relative)
+        const isPublic = ['index.html', 'dice.html', 'pick-a-game/index.html', 'routes.js', 'cover-loader.js', 'style.css', 'script.js', 'games.js', 'storage.js', 'image-assets.js', 'account.js', 'gallery.js', 'cloud.js', 'config.js', 'favicon.ico'].includes(relative)
             || relative.startsWith('images/') || relative.startsWith('svg/');
 
         if (!isPublic || !path.startsWith(root + sep) || relative.split('/').some(part => part.startsWith('.')) || !types[extension]) {
@@ -80,5 +86,5 @@ server.on('error', async error => {
 });
 
 server.listen(port, '127.0.0.1', () => {
-    console.log(`\n  GameLogs V2 → http://localhost:${port}\n  Zapisz plik i odśwież stronę. Zatrzymanie: Ctrl+C.\n`);
+    console.log(`\n  GameLogs V2 → http://localhost:${server.address().port}\n  Zapisz plik i odśwież stronę. Zatrzymanie: Ctrl+C.\n`);
 });

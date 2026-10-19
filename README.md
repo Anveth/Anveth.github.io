@@ -50,7 +50,10 @@ npm run dev
 ## Gdzie edytować
 
 - `index.html` — biblioteka, formularz i sekcje strony głównej.
-- `dice.html` — ekran losowania.
+- `pick-a-game/index.html` — ekran losowania pod `/pick-a-game/`.
+- `dice.html` — zgodność ze starymi linkami: przekierowanie do `/pick-a-game/`.
+- `routes.js` — porządkowanie adresów z zachowaniem parametrów i fragmentów.
+- `cover-loader.js` — pobranie i dekodowanie okładki przed pokazaniem wyniku losowania.
 - `style.css` — cały wygląd i responsywność; bez kompilatora Sass.
 - `script.js` — interfejs katalogu, dzienniki, filtry, oceny, eksport/import i losowanie.
 - `games.js` — początkowa kolekcja gier.
@@ -62,6 +65,18 @@ npm run dev
 - `supabase/schema.sql` — tabele, atomowy zapis, RLS i prywatne okładki.
 - `images/` — okładki oraz kadry z gier.
 - `scripts/dev.mjs` — lokalny serwer podglądu (nie jest backendem aplikacji).
+
+### Adresy bez `.html`
+
+Strona główna używa `/`, sekcje `/#library` i `/#journal`, a losowanie
+`/pick-a-game/`. Link do dziennika wybranej gry ma postać `/?game=ID`.
+Plik `pick-a-game/index.html` działa również po bezpośrednim wejściu
+i odświeżeniu na GitHub Pages — nie wymaga routingu SPA ani backendu.
+Stary `/dice.html` przekierowuje, a `/index.html` porządkuje się do `/`
+bez gubienia parametrów i fragmentów (także powrotów z logowania).
+Adresy e-mail Supabase nadal wracają do dotychczasowego `/index.html`;
+nie trzeba zmieniać listy dozwolonych adresów opisanej w KONTA.md.
+Po zmianie `scripts/dev.mjs` uruchom serwer ponownie przez `npm run dev`.
 
 Statusy i oceny początkowych gier to przykładowe dane. Dzienniki są początkowo
 puste; kliknij okładkę lub Dziennik, aby dodać sesję. Przycisk Edytuj grę
@@ -97,6 +112,10 @@ do 640, 1280 i 1920 px, bez powiększania mniejszych oryginałów. `srcset` dobi
 plik do ekranu, `loading="lazy"` odracza pobieranie galerii poniżej ekranu.
 Pierwsze cztery okładki mają `loading="eager"`; obrazy mają zarezerwowane proporcje,
 żeby ograniczyć skakanie układu. Zewnętrznych linków do obrazów nie konwertujemy.
+Przy losowaniu pobieranie okładki zaczyna się podczas obrotu (nadal 550 ms).
+Wynik pojawia się po przygotowaniu obrazu; przy wolnym połączeniu prawa część
+pozostaje chwilę pusta. Po 2,5 s lub błędzie obrazu pojawia się stabilna okładka
+zastępcza, żeby niedostępny obraz nie blokował losowania.
 
 Po zmianie oryginałów uruchom:
 

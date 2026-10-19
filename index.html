@@ -10,16 +10,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js?v=20261018-7"></script>
+    <script type="module" src="script.js?v=20261018-9"></script>
 </head>
 <body data-page="library">
     <header class="site-header">
         <div class="nav-shell">
-            <a class="brand" href="index.html" aria-label="GameLogs — home">Game<span>Logs</span></a>
+            <a class="brand" href="/" aria-label="GameLogs — home">Game<span>Logs</span></a>
             <nav class="primary-nav" aria-label="Main navigation">
-                <a class="is-active" href="#library">Library</a>
-                <a href="#journal">Journal</a>
-                <a href="dice.html">Pick a game</a>
+                <a class="is-active" href="/#library">Library</a>
+                <a href="/#journal">Journal</a>
+                <a href="/pick-a-game/">Pick a game</a>
             </nav>
             <div class="header-actions"><button class="button button-secondary account-button" id="accountButton" type="button">Log in</button><button class="icon-button" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button></div>
         </div>
@@ -33,7 +33,7 @@
                     <h1 id="heroTitle">Games worth coming back to.</h1>
                     <p class="hero-copy">Save games for later, rate the stories you finish, and keep memories of every session.</p>
                 </div>
-                <div class="hero-actions"><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="dice.html">Pick from Want to play</a></div>
+                <div class="hero-actions"><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="/pick-a-game/">Pick from Want to play</a></div>
             </div>
         </section>
         <section class="library-section page-width" id="library" aria-labelledby="libraryTitle">
@@ -46,7 +46,7 @@
                 <button class="filter-button" type="button" data-filter="completed" aria-pressed="false">Completed</button>
             </div>
             <div class="game-grid" id="gameGrid" aria-live="polite"></div>
-            <div class="library-actions" role="group" aria-label="Library actions"><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="dice.html">Pick from Want to play</a></div>
+            <div class="library-actions" role="group" aria-label="Library actions"><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="/pick-a-game/">Pick from Want to play</a></div>
         </section>
         <section class="journal-section page-width" id="journal" aria-labelledby="journalTitle">
             <div><p class="eyebrow">Your stories</p><h2 id="journalTitle">Player journal</h2></div>

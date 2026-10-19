@@ -149,7 +149,8 @@ export async function mountAccount({ onUserChange, onMigrate, onRefresh, canMigr
         authPending = true;
         el('authSubmit').disabled = true;
         message();
-        const redirectTo = new URL('index.html', location.href).href;
+        // Keep the existing allow-listed callback at the site root, even from nested pages.
+        const redirectTo = new URL('index.html', import.meta.url).href;
         try {
             if (mode === 'reset') {
                 const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });

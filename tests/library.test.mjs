@@ -38,7 +38,7 @@ test('deleting a game removes its journal, persists an empty library, and never 
 
 test('the UI is English-only while stored status identifiers and user content stay compatible', async () => {
     assert.deepEqual(STATUSES, { backlog: 'Want to play', playing: 'Playing', completed: 'Completed' });
-    for (const file of ['index.html', 'dice.html', 'account.js', 'gallery.js', 'script.js', 'storage.js', 'cloud.js']) {
+    for (const file of ['index.html', 'pick-a-game/index.html', 'account.js', 'gallery.js', 'script.js', 'storage.js', 'cloud.js']) {
         const text = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
         // Game names may include non-ASCII characters, but no Polish interface copy should remain.
         assert.doesNotMatch(text, /[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/, file);
@@ -58,7 +58,7 @@ test('library actions are available above and below the games using the same add
     const bottom = html.match(/<div class="library-actions"[^>]*>([\s\S]*?)<\/div>/)[1];
     assert.equal(top, bottom);
     assert.match(bottom, /data-open-dialog>Add a game<\/button>/);
-    assert.match(bottom, /href="dice.html">Pick from Want to play<\/a>/);
+    assert.match(bottom, /href="\/pick-a-game\/">Pick from Want to play<\/a>/);
     assert.ok(html.indexOf('id="gameGrid"') < html.indexOf('class="library-actions"'));
     assert.ok(html.indexOf('class="library-actions"') < html.indexOf('id="journal"'));
 });

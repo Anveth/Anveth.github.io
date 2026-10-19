@@ -107,7 +107,7 @@ W VS Code otwórz **Source Control** (`Ctrl+Shift+G`) i klikaj zmienione pliki,
 żeby obejrzeć różnice. W terminalu dodaj konkretne pliki aplikacji:
 
 ```sh
-git add README.md PUBLIKACJA.md KONTA.md index.html dice.html style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js package.json package-lock.json scripts images/optimized tests supabase
+git add README.md PUBLIKACJA.md KONTA.md index.html dice.html pick-a-game routes.js cover-loader.js style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js package.json package-lock.json scripts images/optimized tests supabase
 git diff --cached --stat
 git commit -m "Improve gallery and optimize images"
 ```
@@ -150,8 +150,10 @@ nie zastępuje tokenu w uwierzytelnianiu Git. Nie wklejaj tokenów do plików pr
 6. Przejdź do zakładki **Actions** i otwórz najnowszy przebieg **pages build and deployment**.
 7. Zaczekaj, aż zakończy się powodzeniem. Kliknij link do wdrożonej strony.
 
-`index.html`, `dice.html`, `style.css`, `script.js`, `games.js`, `storage.js`
-i katalog `images/` muszą być bezpośrednio w głównym katalogu repozytorium.
+`index.html`, `dice.html`, `routes.js`, `cover-loader.js`, `style.css`, `script.js`, `games.js`, `storage.js`
+i katalogi `pick-a-game/` oraz `images/` muszą być bezpośrednio w głównym katalogu repozytorium.
+Losowanie znajduje się w `pick-a-game/index.html`, czyli pod adresem `/pick-a-game/`.
+`dice.html` zachowuje przekierowanie dla starych linków.
 Nie przesyłaj folderu `gamelogsV2` jako dodatkowego katalogu wewnątrz repo.
 
 Źródło ustawień: [oficjalna dokumentacja GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).

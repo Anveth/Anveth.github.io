@@ -84,7 +84,7 @@ test('the footer stays at the bottom of short pages without covering long conten
 });
 
 test('game picker dedicates space to a large accessible result and stacks on smaller screens', async () => {
-    const html = await readFile(new URL('../dice.html', import.meta.url), 'utf8');
+    const html = await readFile(new URL('../pick-a-game/index.html', import.meta.url), 'utf8');
     const script = await readFile(new URL('../script.js', import.meta.url), 'utf8');
     assert.match(html, /class="dice-controls"/);
     assert.match(html, /class="dice-result-area"/);
@@ -96,11 +96,11 @@ test('game picker dedicates space to a large accessible result and stacks on sma
     assert.match(css, /\.dice-empty h2\s*\{[^}]*font-size: clamp\(38px, 3\.5vw, 56px\)/);
     assert.match(css, /\.dice-empty > p:last-child\s*\{[^}]*max-width: 510px;[^}]*font-size: 18px/);
     assert.match(script, /<h2 class="result-title" id="resultTitle">\$\{escapeHtml\(game.title\)\}/);
-    assert.match(script, /gameCover\(game, 'result-cover', true\)/);
+    assert.match(script, /gameCover\(game, 'result-cover', true, coverLoaded\)/);
 });
 
 test('all six SVG dice faces have the right pip count and symmetric geometry', async () => {
-    const html = await readFile(new URL('../dice.html', import.meta.url), 'utf8');
+    const html = await readFile(new URL('../pick-a-game/index.html', import.meta.url), 'utf8');
     assert.match(html, /class="dice-symbol" viewBox="0 0 64 64"/);
     const dots = [...html.matchAll(/<circle\b([^>]+)>/g)].map(([, attrs]) => ({
         x: Number(attrs.match(/cx="(\d+)"/)[1]),
