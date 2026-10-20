@@ -1,4 +1,5 @@
 import { IMAGE_ASSETS } from './image-assets.js?v=20261018-2';
+import { DEFAULT_GAMES } from './games.js?v=20261018-2';
 
 export const STATUSES = { backlog: 'Want to play', playing: 'Playing', completed: 'Completed' };
 const LIBRARY_KEY = 'gamelogs:library';
@@ -55,6 +56,12 @@ export function loadLibrary() {
         && game.title === 'The Walking Dead' && game.platform === 'PC' && game.year === 2012
         && game.status === 'completed' && game.rating === 8 && game.notes.length === 0
         && !game.imageKey && ['images/twd.jpg', 'images/optimized/covers/twd-640.webp'].includes(game.image)));
+}
+
+export function loadGuestLibrary() {
+    const saved = loadLibrary();
+    // Demo is a guest-only view, not saved data or a seed for a new account.
+    return saved.length ? saved : DEFAULT_GAMES.map(normalizeGame);
 }
 
 export function saveLibrary(games) {

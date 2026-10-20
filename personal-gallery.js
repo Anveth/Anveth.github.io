@@ -1,7 +1,7 @@
 import { setupGallery } from './gallery.js?v=20261019-4';
 import { DEMO_SCREENSHOTS, galleryMarkup } from './gallery-demo.js?v=20261019-1';
 import { createCloudGalleryStore } from './screenshots.js?v=20261019-1';
-import { prepareCover, validateCoverFile } from './storage.js?v=20261019-1';
+import { prepareCover, validateCoverFile } from './storage.js?v=20261019-2';
 
 export function setupPersonalGallery() {
     const el = id => document.getElementById(id);

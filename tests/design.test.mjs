@@ -10,13 +10,13 @@ const luminance = hex => rgb(hex).map(value => value / 255).map(value => value <
     .reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
 const contrast = (a, b) => (Math.max(luminance(a), luminance(b)) + .05) / (Math.min(luminance(a), luminance(b)) + .05);
 
-test('rearranged captions retain purple and green accents with readable contrast in both themes', () => {
-    for (const selector of ['copy-lead', 'section-caption', 'dialog-caption', 'result-context']) {
-        assert.match(css, new RegExp(`\\.${selector} \\{[^}]*color: var\\(--accent\\)`));
+test('secondary captions are neutral and both text and the single purple accent remain readable', () => {
+    for (const selector of ['copy-lead', 'section-caption', 'dialog-caption']) {
+        assert.match(css, new RegExp(`\\.${selector} \\{[^}]*color: var\\(--muted\\)`));
     }
-    assert.match(css, /\.hero \.section-caption,\s*\.journal-section \.section-caption \{ color: var\(--journal-accent\); \}/);
+    assert.doesNotMatch(css, /--journal-accent/);
     for (const theme of themes) {
-        for (const accent of ['accent', 'journal-accent']) {
+        for (const accent of ['accent', 'muted', 'text']) {
             for (const background of ['background', 'surface']) {
                 assert.ok(contrast(color(theme, accent), color(theme, background)) >= 4.5);
             }
@@ -31,15 +31,15 @@ test('captions remain in descriptions or beside headings instead of uppercase ey
         if (file.endsWith('.html')) assert.doesNotMatch(source, /account-status|id="accountStatus"/, file);
     }
     const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-    for (const id of ['heroTitle', 'libraryTitle', 'journalTitle', 'galleryTitle']) {
+    for (const id of ['libraryTitle', 'journalTitle', 'galleryTitle']) {
         assert.match(home, new RegExp(`<h[12] id="${id}"`));
     }
     assert.match(home, /class="dialog-heading detail-toolbar"/);
     assert.match(css, /\.detail-toolbar \{ justify-content: space-between; \}/);
-    for (const caption of ['Your gaming journal', 'My collection', 'Your stories', 'In-game moments', 'Your library', 'Your journal', 'Library management']) {
+    for (const caption of ['Your gaming journal', 'Your stories', 'In-game moments', 'Your library', 'Your journal', 'Library management']) {
         assert.ok(home.includes(caption), caption);
     }
-    assert.match(home, /<h2 id="libraryTitle"[^>]*>Library<\/h2><p class="section-caption">My collection<\/p>/);
+    assert.match(home, /<h1 id="libraryTitle"[^>]*>Library<\/h1><p class="section-caption">Your gaming journal<\/p>/);
     assert.match(home, /class="section-caption">Your gaming journal<\/p>/);
     assert.match(css, /\.section-title-group \{[^}]*align-items: baseline/);
     assert.doesNotMatch(css, /\.section-caption \{[^}]*(?:text-transform: uppercase|letter-spacing)/);
@@ -58,14 +58,14 @@ test('library count and transfer controls have larger scoped typography and spac
     assert.match(css, /\.library-tools \.game-count,\s*\.library-tools \.text-button \{ font-size: clamp\(16px, 1vw, 18px\); \}/);
 });
 
-test('library controls stack transfer tools above actions and intro typography is smaller', async () => {
+test('library controls keep transfer tools above actions and responsive section spacing', async () => {
     const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
     assert.doesNotMatch(home, /class="hero-actions"/);
     assert.match(css, /\.library-heading \{[^}]*grid-template-areas: "title tools" "filters actions"; align-items: center/);
     assert.match(css, /\.library-heading > \.filter-bar \{[^}]*grid-area: filters;[^}]*margin: 0/);
     assert.match(css, /\.library-heading > \.library-primary-actions \{ grid-area: actions/);
     assert.match(css, /@media \(max-width: 900px\) \{\s*\.library-heading \{[^}]*grid-template-areas: "title" "tools" "actions" "filters"/);
-    assert.match(css, /\.hero h1 \{[^}]*font-size: clamp\(32px, 4vw, 46px\)/);
+    assert.match(css, /\.library-heading h1 \{[^}]*font-size: clamp\(28px, 4vw, 42px\)/);
     assert.match(css, /\.journal-section \{[^}]*padding-block: 48px 104px/);
     assert.match(css, /\.gallery-hint \{ margin: 18px 0 36px/);
     assert.match(css, /\.gallery-track \{ grid-auto-columns: 100%; \}/);
@@ -77,52 +77,60 @@ test('library rows and covers have more breathing room without changing their al
     assert.match(css, /\.library-heading \{ gap: 24px; margin-bottom: 32px; \}/);
 });
 
-test('hero uses a short caption beside the title with no trailing periods or long description', async () => {
+test('library replaces the promotional hero and redundant journal buttons', async () => {
     const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-    assert.match(home, /class="section-title-group"><h1 id="heroTitle">Games worth coming back to<\/h1><p class="section-caption">Your gaming journal<\/p>/);
+    const script = await readFile(new URL('../script.js', import.meta.url), 'utf8');
+    assert.match(home, /<h1 id="libraryTitle"[^>]*>Library<\/h1><p class="section-caption">Your gaming journal<\/p>/);
+    assert.doesNotMatch(home, /heroTitle|Games worth coming back to|My collection/);
+    assert.doesNotMatch(script, /diary-link|Journal button below/);
     assert.doesNotMatch(home, /Save games for later|keep memories of every session|library-description/);
     assert.doesNotMatch(css, /\.library-description/);
 });
 
-test('green journal text stays readable in both themes and purple remains the main accent', () => {
+test('purple is the only decorative accent and journal titles stay neutral until interaction', () => {
     for (const theme of themes) {
-        const journal = color(theme, 'journal-accent');
-        const [red, green, blue] = rgb(journal);
-        assert.ok(green > red && green > blue);
-        assert.ok(contrast(journal, color(theme, 'background')) >= 4.5);
-        assert.ok(contrast(journal, color(theme, 'surface')) >= 4.5);
         const [, primaryGreen, primaryBlue] = rgb(color(theme, 'accent'));
         assert.ok(primaryBlue > primaryGreen);
     }
-    assert.match(css, /\.diary-link\s*\{[^}]*color: var\(--journal-accent\)/);
+    assert.match(css, /\.journal-entry \.journal-game \{[^}]*color: var\(--text\)/);
+    assert.match(css, /\.journal-entry \.journal-game:hover,[^}]*color: var\(--accent\)/);
     assert.match(css, /\.brand span\s*\{[^}]*color: var\(--accent\)/);
 });
 
-test('green hover and keyboard focus target unselected library filters only', () => {
+test('purple hover and keyboard focus target unselected library filters only', () => {
     for (const state of ['hover', 'focus-visible']) {
         const selector = `.filter-bar .filter-button:not(.is-selected):${state}`;
         const rule = css.slice(css.indexOf(selector)).split('}')[0];
         assert.ok(css.includes(selector));
-        assert.match(rule, /color: var\(--journal-accent\)/);
-        assert.match(rule, /border-color: var\(--journal-accent\)/);
+        assert.match(rule, /color: var\(--accent\)/);
+        assert.match(rule, /border-color: var\(--accent\)/);
     }
     assert.match(css, /\.filter-bar \.filter-button\s*\{[^}]*transition: color 150ms/);
     assert.match(css, /\.filter-button\.is-selected\s*\{[^}]*border-color: var\(--accent\); background: var\(--accent-soft\)/);
     assert.doesNotMatch(css, /\.filter-button:hover\s*\{[^}]*journal-accent/);
 });
 
-test('status focus uses green borders without recoloring the field or other forms', () => {
+test('status has no focus rectangle while keyboard focus retains a visible underline', () => {
     const rule = css.match(/\.status-select:focus\s*\{([^}]+)\}/)[1];
-    assert.match(rule, /border-color: var\(--journal-accent\)/);
-    assert.match(rule, /outline-color: var\(--journal-accent\)/);
+    assert.match(rule, /outline: none/);
+    assert.match(css, /\.status-select:focus-visible \{[^}]*border-bottom-color: var\(--accent\);[^}]*box-shadow: inset 0 -2px var\(--accent\)/);
+    assert.match(css, /\.status-select \{[^}]*border: 0;[^}]*border-bottom: 1px solid var\(--line\);[^}]*background: transparent/);
     assert.doesNotMatch(`{${rule}`, /[;{]\s*(?:background(?:-color)?|color)\s*:/);
     assert.match(css, /:focus-visible\s*\{ outline: 3px solid var\(--accent\)/);
 });
 
-test('the larger green dice has no tinted tile and retains its purple roll button and animation', () => {
+test('hovering a cover or title shares the cover motion and title color without moving the text', () => {
+    const selector = '.game-card:has(.cover-button:hover, .game-title:hover)';
+    assert.ok(css.includes(`${selector} .cover-button { transform: translateY(-7px) scale(1.025); }`));
+    assert.ok(css.includes(`${selector} .game-title { color: var(--accent-strong); }`));
+    assert.ok(css.includes(`${selector} .cover-button { transform: none; }`));
+    assert.doesNotMatch(css, /\.game-title(?::[\w-]+)?\s*\{[^}]*\btransform:/);
+});
+
+test('the larger purple dice has no tinted tile and retains its roll button and animation', () => {
     const rule = css.match(/\.dice-face\s*\{([^}]+)\}/)[1];
     assert.match(rule, /background: transparent/);
-    assert.match(rule, /color: var\(--journal-accent\)/);
+    assert.match(rule, /color: var\(--accent\)/);
     assert.match(css, /\.dice-controls\s*\{ --dice-size: clamp\(200px, 18vw, 240px\)/);
     assert.match(css, /\.dice-symbol\s*\{[^}]*width: 90%; height: 90%/);
     assert.match(css, /\.dice-controls\s*\{ --dice-size: 160px/);
@@ -147,7 +155,7 @@ test('picker button follows the visible dice width and supporting text is more r
     }
 });
 
-test('footer wordmark and tagline use separate accents and spacing without a dot', async () => {
+test('footer combines a purple wordmark accent and neutral tagline without a dot', async () => {
     const footer = '<footer class="site-footer"><p><span class="footer-brand">Game<span class="footer-brand-accent">Logs</span></span><span class="footer-tagline">Your <span class="footer-gaming">gaming</span> journal</span></p></footer>';
     for (const file of ['index.html', 'pick-a-game/index.html']) {
         const html = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -155,7 +163,7 @@ test('footer wordmark and tagline use separate accents and spacing without a dot
     }
     assert.match(css, /\.site-footer p \{[^}]*flex-wrap: wrap; gap: 8px 24px/);
     assert.match(css, /\.footer-brand-accent \{ color: var\(--accent\); \}/);
-    assert.match(css, /\.footer-gaming \{ color: var\(--journal-accent\); \}/);
+    assert.match(css, /\.footer-tagline, \.footer-gaming \{ color: var\(--muted\); \}/);
 });
 
 test('the footer stays at the bottom of short pages without covering long content', () => {

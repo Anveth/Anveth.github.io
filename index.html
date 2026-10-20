@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="GameLogs — your personal game library and journal.">
     <title>GameLogs — my library</title>
-    <link rel="stylesheet" href="style.css?v=20261019-19">
+    <link rel="stylesheet" href="style.css?v=20261021-8">
     <link rel="icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js?v=20261019-6"></script>
+    <script type="module" src="script.js?v=20261021-2"></script>
 </head>
 <body data-page="library">
     <header class="site-header">
@@ -25,12 +25,9 @@
         </div>
     </header>
     <main>
-        <section class="hero page-width" aria-labelledby="heroTitle">
-            <div class="section-title-group"><h1 id="heroTitle">Games worth coming back to</h1><p class="section-caption">Your gaming journal</p></div>
-        </section>
         <section class="library-section page-width" id="library" aria-labelledby="libraryTitle">
             <div class="section-heading library-heading">
-                <div class="section-title-group"><h2 id="libraryTitle" tabindex="-1">Library</h2><p class="section-caption">My collection</p></div>
+                <div class="section-title-group"><h1 id="libraryTitle" tabindex="-1">Library</h1><p class="section-caption">Your gaming journal</p></div>
                 <div class="library-tools"><p class="game-count" id="gameCount" aria-live="polite"></p><button class="text-button" id="exportLibrary" type="button">Export</button><label class="text-button import-label">Import<input id="importLibrary" type="file" accept="application/json,.json"></label></div>
                 <div class="filter-bar" aria-label="Filter library">
                     <button class="filter-button is-selected" type="button" data-filter="all" aria-pressed="true">All</button>
@@ -42,7 +39,7 @@
             </div>
             <p class="app-message" id="appMessage" role="status" hidden></p>
             <div class="game-grid" id="gameGrid" aria-live="polite"></div>
-            <div class="library-actions" role="group" aria-label="Library actions"><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="/pick-a-game/">Pick from Want to play</a></div>
+            <div class="library-actions" id="libraryBottomActions" role="group" aria-label="Library actions" hidden><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="/pick-a-game/">Pick from Want to play</a></div>
         </section>
         <section class="journal-section page-width" id="journal" aria-labelledby="journalTitle">
             <div class="section-heading journal-heading"><div class="section-title-group"><h2 id="journalTitle">Player journal</h2><p class="section-caption">Your stories</p></div><p class="journal-count" id="journalCount" role="status"></p></div>
@@ -64,7 +61,6 @@
             <div class="dialog-heading"><div><h2 id="dialogTitle">Add a game</h2><p class="dialog-caption">Your library</p></div><button class="close-button" type="button" data-close-dialog aria-label="Close form">×</button></div>
             <div class="form-grid">
                 <label>Game title<input name="title" type="text" autocomplete="off" required maxlength="80" placeholder="e.g. Hades II"></label>
-                <label>Platform<input name="platform" type="text" autocomplete="off" maxlength="30" placeholder="e.g. PC"></label>
                 <label>Release year<input name="year" type="number" min="1958" max="2100" placeholder="2026"></label>
                 <label>Status<select name="status"><option value="backlog">Want to play</option><option value="playing">Playing</option><option value="completed">Completed</option></select></label>
                 <label>Rating (1–10, optional)<input name="rating" type="number" min="1" max="10" step="1" placeholder="—"></label>

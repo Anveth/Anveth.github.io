@@ -79,7 +79,7 @@ nie trzeba zmieniać listy dozwolonych adresów opisanej w KONTA.md.
 Po zmianie `scripts/dev.mjs` uruchom serwer ponownie przez `npm run dev`.
 
 Statusy i oceny początkowych gier to przykładowe dane. Dzienniki są początkowo
-puste; kliknij okładkę lub Dziennik, aby dodać sesję. Przycisk Edytuj grę
+puste; kliknij okładkę lub tytuł gry, aby dodać sesję. Przycisk Edytuj grę
 pozwala zmienić tytuł, status, ocenę i okładkę bez utraty notatek.
 Po zalogowaniu biblioteka konta zapisuje się w Supabase. Nowe konto jest puste;
 lokalną kolekcję przenosisz jawnie przyciskiem w panelu **Moje konto**.
@@ -101,9 +101,13 @@ Okładka Cyberpunk 2077 pochodzi z [zasobów Steam](https://shared.fastly.steams
 
 ## Lżejsze grafiki i większa galeria
 
-Nowa biblioteka zaczyna się pusta, z kafelkiem „Add your first game”. Zapisane wcześniej
-gry i wpisy pozostają bez zmian. Player journal pokazuje cztery wpisy w dwóch kolumnach;
+Bez logowania pusta lokalna biblioteka pokazuje 15 domyślnych gier. To widok demo,
+nie dane automatycznie zapisywane lub przenoszone na konto. Dopiero nowa biblioteka
+konta zaczyna się pusta, z kafelkiem „Add your first game”. Zapisane wcześniej gry
+i wpisy pozostają bez zmian. Player journal pokazuje cztery wpisy w dwóch kolumnach;
 „Show more” odsłania kolejne (na telefonie jedna kolumna).
+Dolne przyciski Add a game / Pick from Want to play pojawiają się od 16 gier
+w aktualnie wyświetlanej liście; górne są dostępne zawsze.
 
 Bez logowania galeria pokazuje dotychczasowe 18 zoptymalizowanych zdjęć demonstracyjnych.
 Nie ma w niej przycisków dodawania, usuwania ani Refresh. Po zalogowaniu galeria jest

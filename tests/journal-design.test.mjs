@@ -17,14 +17,15 @@ const setup = library => {
         byId: id => ({ recentNotes: target, journalCount: count, showMoreEntries: more }[id]),
         STATUSES: { playing: 'Playing', completed: 'Completed', backlog: 'Want to play' },
         escapeHtml: value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char])),
-        formatDate: date => date
+        formatDate: date => date,
+        gameCover: (game, className) => `<div class="${className}">Cover</div>`
     });
     runInContext(`${renderer}; ${loadMore}; renderRecentNotes();`, context);
     return { target, count, more, next: () => runInContext('showMoreJournalEntries()', context) };
 };
 const render = library => setup(library).target.innerHTML;
 
-test('journal entries use dated rows, retain ordering and escape titles and notes', () => {
+test('journal entries include covers, retain ordering and escape titles and notes', () => {
     const html = render([{ id: 'demo', title: 'Game <title>', status: 'playing', notes: [
         { id: 'old', text: 'Earlier entry', date: '2026-10-17', createdAt: '2026-10-17', minutes: null },
         { id: 'new', text: '<script>alert(1)</script>', date: '2026-10-19', createdAt: '2026-10-19', minutes: 45 }
@@ -37,6 +38,8 @@ test('journal entries use dated rows, retain ordering and escape titles and note
     assert.match(html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
     assert.doesNotMatch(html, /<script>|class="journal-note"/);
     assert.match(html, /data-open-game="demo"/);
+    assert.equal((html.match(/class="journal-cover"/g) || []).length, 2);
+    assert.match(html, /class="journal-entry-header"/);
 });
 
 test('empty journal hides pagination and reports no entries', () => {
@@ -75,4 +78,7 @@ test('journal heading sits above full-width card grid with a single column on ph
     assert.match(css, /\.recent-notes \{ grid-template-columns: minmax\(0, 1fr\)/);
     assert.match(html, /id="showMoreEntries"[^>]*aria-controls="recentNotes"/);
     assert.match(script, /byId\('showMoreEntries'\)\.addEventListener\('click', showMoreJournalEntries\)/);
+    const entry = css.match(/\.journal-entry \{([^}]+)\}/)[1];
+    assert.match(entry, /border-top: 1px solid var\(--line\)/);
+    assert.doesNotMatch(entry, /background:|border-radius:/);
 });

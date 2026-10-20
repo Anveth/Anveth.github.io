@@ -1,5 +1,5 @@
-import { setupPersonalGallery } from './personal-gallery.js?v=20261019-2';
-import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, saveLibrary, removeGame, removeEntry, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261019-1';
+import { setupPersonalGallery } from './personal-gallery.js?v=20261019-3';
+import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, loadGuestLibrary, saveLibrary, removeGame, removeEntry, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261019-2';
 import { createCloudStore } from './cloud.js?v=20261018-2';
 import { mountAccount } from './account.js?v=20261019-2';
 import { cleanPageURL } from './routes.js?v=20261018-1';
@@ -11,7 +11,7 @@ if (pageURL.href !== location.href) history.replaceState(history.state, '', page
 
 let library = [];
 let readError = '';
-try { library = loadLibrary(); } catch (error) { readError = error.message; }
+try { library = loadGuestLibrary(); } catch (error) { readError = error.message; }
 let currentFilter = 'all';
 const JOURNAL_PAGE_SIZE = 4;
 let visibleJournalEntries = JOURNAL_PAGE_SIZE;
@@ -22,6 +22,7 @@ let previewUrl = '';
 let pendingImport = null;
 let pendingDeletion = null;
 let cloudStore = null;
+let isAccountLibrary = false;
 let scopeEpoch = 0;
 let writePending = false;
 let identityPending = Boolean(SUPABASE_CONFIG.url || SUPABASE_CONFIG.publishableKey);
@@ -119,15 +120,17 @@ function renderLibrary() {
     const count = games.length;
     const noun = count === 1 ? 'game' : 'games';
     byId('gameCount').textContent = `${count} ${noun}`;
+    byId('libraryBottomActions').hidden = count < 16;
     grid.innerHTML = games.length ? games.map((game, index) => `<article class="game-card">
         <button class="cover-button" type="button" data-open-game="${escapeHtml(game.id)}" aria-label="Open journal: ${escapeHtml(game.title)}">${gameCover(game, 'game-cover', index < 4)}</button>
         <div class="game-card-content">
             <button class="game-title" type="button" data-open-game="${escapeHtml(game.id)}">${escapeHtml(game.title)}</button>
-            <p class="game-meta">${escapeHtml(game.platform || 'Unknown platform')}${game.year ? ` · ${game.year}` : ''}</p>
-            <label class="select-label">Status<select class="status-select" data-status-id="${escapeHtml(game.id)}" aria-label="Status for ${escapeHtml(game.title)}">${Object.entries(STATUSES).map(([value, label]) => `<option value="${value}" ${game.status === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
-            ${game.status === 'completed' ? `<label class="rating-label">Rating<input class="rating-input" data-rating-id="${escapeHtml(game.id)}" aria-label="Rating for ${escapeHtml(game.title)}" type="number" min="1" max="10" step="1" inputmode="numeric" value="${game.rating ?? ''}" placeholder="—"><span>/ 10</span></label>` : `<p class="status-hint">${game.status === 'playing' ? 'In progress' : 'Ready when you are'}</p>`}
-            <button class="text-button diary-link" type="button" data-open-game="${escapeHtml(game.id)}">Journal <span>${game.notes.length ? `(${game.notes.length})` : '↗'}</span></button>
-        </div></article>`).join('') : library.length ? '<p class="empty-state">No games in this list yet. Try another filter or add a game.</p>' : '<button class="first-game-tile" type="button" data-open-dialog><span class="placeholder-plus" aria-hidden="true">+</span><strong>Add your first game</strong><span>Your library starts here</span></button>';
+            <p class="game-meta">${game.year || ''}</p>
+            <div class="game-controls">
+                <div class="status-control"><select class="status-select" data-status-id="${escapeHtml(game.id)}" aria-label="Status for ${escapeHtml(game.title)}">${Object.entries(STATUSES).map(([value, label]) => `<option value="${value}" ${game.status === value ? 'selected' : ''}>${label}</option>`).join('')}</select></div>
+                <label class="rating-label">Rating<span class="rating-value"><input class="rating-input" data-rating-id="${escapeHtml(game.id)}" aria-label="Rating for ${escapeHtml(game.title)}" type="number" min="1" max="10" step="1" inputmode="numeric" value="${game.rating ?? ''}" placeholder="—"><span>/ 10</span></span></label>
+            </div>
+        </div></article>`).join('') : isAccountLibrary && !library.length ? '<button class="first-game-tile" type="button" data-open-dialog><span class="placeholder-plus" aria-hidden="true">+</span><strong>Add your first game</strong><span>Your library starts here</span></button>' : '<p class="empty-state">No games in this list yet. Try another filter or add a game.</p>';
 }
 
 function noteMarkup(note) {
@@ -209,7 +212,14 @@ function renderRecentNotes() {
         .sort((a, b) => b.note.date.localeCompare(a.note.date) || b.note.createdAt.localeCompare(a.note.createdAt));
     if (!entries.length) visibleJournalEntries = JOURNAL_PAGE_SIZE;
     const recent = entries.slice(0, visibleJournalEntries);
-    container.innerHTML = recent.length ? recent.map(({ game, note }) => `<article class="journal-entry"><div class="journal-entry-date"><time datetime="${escapeHtml(note.date)}">${formatDate(note.date)}</time>${note.minutes ? `<span>${note.minutes} min</span>` : ''}</div><div class="journal-entry-body"><button class="journal-game text-button" type="button" data-open-game="${escapeHtml(game.id)}">${escapeHtml(game.title)}</button><p class="entry-status">${STATUSES[game.status]}</p><p class="note-text">${escapeHtml(note.text)}</p></div></article>`).join('') : '<div class="journal-empty"><h3>Every game has a story.</h3><p>Select a cover or the Journal button below a game to write about your first session.</p></div>';
+    container.innerHTML = recent.length ? recent.map(({ game, note }) => `<article class="journal-entry">
+        <div class="journal-entry-date"><time datetime="${escapeHtml(note.date)}">${formatDate(note.date)}</time>${note.minutes ? `<span>${note.minutes} min</span>` : ''}</div>
+        <div class="journal-entry-header">
+            <button class="journal-cover-button" type="button" data-open-game="${escapeHtml(game.id)}" aria-label="Open journal: ${escapeHtml(game.title)}">${gameCover(game, 'journal-cover')}</button>
+            <div class="journal-entry-body"><button class="journal-game text-button" type="button" data-open-game="${escapeHtml(game.id)}">${escapeHtml(game.title)}</button><p class="entry-status">${STATUSES[game.status]}</p></div>
+        </div>
+        <p class="note-text">${escapeHtml(note.text)}</p>
+    </article>`).join('') : '<div class="journal-empty"><h3>Every game has a story.</h3><p>Select a game cover or title to write about your first session.</p></div>';
     byId('journalCount').textContent = entries.length ? `${recent.length} of ${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}` : 'No entries yet';
     const remaining = entries.length - recent.length;
     const more = byId('showMoreEntries');
@@ -227,7 +237,7 @@ function showMoreJournalEntries() {
 function renderDetails() {
     const game = library.find(item => item.id === selectedId);
     if (!game) return;
-    byId('detailHeader').innerHTML = `${gameCover(game, 'detail-cover')}<div><h2 id="detailTitle">${escapeHtml(game.title)}</h2><p class="game-meta">${escapeHtml(game.platform || 'Unknown platform')}${game.year ? ` · ${game.year}` : ''}</p><p class="detail-status">${STATUSES[game.status]}${game.rating ? ` · Rating ${game.rating}/10` : ''}</p></div>`;
+    byId('detailHeader').innerHTML = `${gameCover(game, 'detail-cover')}<div><h2 id="detailTitle">${escapeHtml(game.title)}</h2><p class="game-meta">${game.year || ''}</p><p class="detail-status">${STATUSES[game.status]}${game.rating ? ` · Rating ${game.rating}/10` : ''}</p></div>`;
     byId('noteList').innerHTML = game.notes.length ? [...game.notes].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)).map(noteMarkup).join('') : '<p class="journal-meta">No entries yet. Start with your first session.</p>';
 }
 
@@ -267,7 +277,7 @@ function openGameForm(id = null) {
     showError('gameFormError');
     byId('dialogTitle').textContent = game ? 'Edit game' : 'Add a game';
     if (game) {
-        for (const field of ['title', 'platform', 'year', 'status', 'rating']) form.elements[field].value = game[field] ?? '';
+        for (const field of ['title', 'year', 'status', 'rating']) form.elements[field].value = game[field] ?? '';
         form.elements.image.value = game.image?.startsWith('http') ? game.image : '';
     }
     updatePreview(game ? coverUrls.get(game.imageKey) || safeImage(game.image) : '');
@@ -396,7 +406,7 @@ async function saveGame(event) {
             imageKey = '';
             image = safeImage(fields.get('image').trim());
         }
-        const game = normalizeGame({ id, title, platform: fields.get('platform').trim(), year: fields.get('year'), status: fields.get('status'), rating: fields.get('rating'), image, imageKey, notes: existing?.notes || [] });
+        const game = normalizeGame({ id, title, platform: existing?.platform || '', year: fields.get('year'), status: fields.get('status'), rating: fields.get('rating'), image, imageKey, notes: existing?.notes || [] });
         byId('saveGame').textContent = 'Saving…';
         await commitLibrary(existing ? library.map(item => item.id === id ? game : item) : [game, ...library], epoch);
         byId('gameDialog').close();
@@ -498,7 +508,7 @@ function setupDicePage() {
         try {
             if (identityPending) throw new Error('Please wait for your account to load.');
             if (readError) throw new Error(readError);
-            const games = cloudStore ? await cloudStore.load() : loadLibrary();
+            const games = cloudStore ? await cloudStore.load() : loadGuestLibrary();
             assertScope(epoch);
             library = games;
         } catch (error) { byId('diceMessage').textContent = error.message; return; }
@@ -525,7 +535,7 @@ function setupDicePage() {
             byId('diceFace').classList.remove('is-rolling');
             byId('diceFace').dataset.value = String(1 + Math.floor(Math.random() * 6));
             byId('diceMessage').textContent = `Today’s pick: ${game.title}`;
-            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover', true, coverLoaded)}<div class="result-content"><h2 class="result-title" id="resultTitle">${escapeHtml(game.title)}</h2><p class="result-meta"><span class="result-context">Today’s pick</span> · ${escapeHtml(game.platform)}${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button result-journal-link" href="/?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
+            byId('randomResult').innerHTML = `${gameCover(game, 'result-cover', true, coverLoaded)}<div class="result-content"><h2 class="result-title" id="resultTitle">${escapeHtml(game.title)}</h2><p class="result-meta"><span class="result-context">Today’s pick</span>${game.year ? ` · ${game.year}` : ''}</p><p class="result-status">${STATUSES[game.status]}</p><a class="text-button result-journal-link" href="/?game=${encodeURIComponent(game.id)}">Open journal ↗</a></div>`;
             byId('randomResult').hidden = false;
             button.disabled = false;
         }, 550);
@@ -545,6 +555,7 @@ if (legacySection && byId(legacySection)) {
 
 async function changeIdentity(user, client, connectionError) {
     const epoch = ++scopeEpoch;
+    isAccountLibrary = Boolean(user);
     const galleryReady = personalGallery?.setScope(client, user?.id, connectionError);
     identityPending = true;
     document.querySelector('main').inert = true;
@@ -567,7 +578,7 @@ async function changeIdentity(user, client, connectionError) {
     readError = '';
     try {
         if (connectionError) throw connectionError;
-        const games = cloudStore ? await cloudStore.load() : loadLibrary();
+        const games = cloudStore ? await cloudStore.load() : loadGuestLibrary();
         if (scopeEpoch !== epoch) return;
         library = games;
         renderLibrary();
