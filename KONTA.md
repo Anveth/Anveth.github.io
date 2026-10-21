@@ -1,5 +1,11 @@
 # Konta GameLogs — Supabase i GitHub Pages
 
+> Wersja React: aktywny kod kont jest teraz w `src/components/Account.tsx`,
+> `src/state/library.ts` i `src/services/`. Konfiguracja Supabase, SQL i adresy
+> powrotu pozostają takie same. Instrukcje publikacji i listy plików poniżej
+> opisują starszą wersję — dla Reacta stosuj [PUBLIKACJA.md](PUBLIKACJA.md).
+> Nie uruchamiaj ponownie schematu tylko z powodu migracji frontendu.
+
 ## Co jest już przygotowane
 
 Projekt Supabase **GameLogs**, region Europa (Irlandia), jest połączony przez

@@ -1,206 +1,106 @@
+# GameLogs
 
-# GameLogs V2
+Osobista biblioteka gier, dziennik sesji, prywatna galeria screenshotów i losowanie kolejnej gry.
+Frontend: **React + TypeScript + Vite**, dotychczasowy CSS bez Tailwinda. Konta, baza i prywatne pliki: Supabase.
 
-Osobisty katalog gier: backlog, aktualnie ogrywane i ukończone tytuły,
-oceny, dodawanie gier z własnymi okładkami, dzienniki sesji, jasny/ciemny
-motyw i losowanie gry z biblioteki. Eksport/import przenosi także własne okładki.
+Migracja jest na gałęzi `codex/react-typescript-migration`. Nie została opublikowana.
+Kontrola typów i build nie zastępują sprawdzenia działania — lista odbiorowa jest w [MIGRATION.md](MIGRATION.md).
 
-**Pełny poradnik publikacji i podmiany starej strony: [PUBLIKACJA.md](PUBLIKACJA.md).**
+## Uruchamianie
 
-**Konta, prywatny zapis w Supabase i konfiguracja e-mail: [KONTA.md](KONTA.md).**
-
-## Dwa oddzielne projekty
-
-- `../Anveth.github.io` — lokalne archiwum starego sklepu, przywrócone z commita `87a88a8`.
-- `gamelogsV2` — aktualnie rozwijana aplikacja. Ten folder ma historię Git
-  oraz `origin` ustawiony na `https://github.com/Anveth/Anveth.github.io`.
-
-Nazwa folderu na komputerze może być inna niż nazwa repozytorium GitHub.
-Docelowy adres nowej wersji to **https://anveth.github.io/**.
-
-## Uruchamianie w VS Code
-
-Wybierz **File → Open Folder…** i otwórz folder `gamelogsV2`.
-Potem **Terminal → New Terminal** i wpisz:
-
-```sh
-npm run dev
-```
-
-Otwórz **http://localhost:5173**. Zapisuj zmiany w VS Code (`Cmd+S`)
-i odświeżaj przeglądarkę (`Cmd+R`). Serwer wyłączysz przez `Ctrl+C`
-w jego terminalu. Możesz też wybrać **Terminal → Run Task… →
-GameLogs V2: uruchom podgląd**.
-
-Jeśli serwer już działa, kolejne `npm run dev` wyświetli działający adres.
-Nie zmieniamy automatycznie portu, aby zachować jeden magazyn danych.
-
-Wymagany jest Node.js 20.9 lub nowszy (zalecany aktualny LTS). Podgląd nie wymaga `npm install`.
-`npm run check` sprawdza składnię JavaScript. Testy bazy wymagają jednorazowego
-`npm ci`, a następnie `npm test` (PostgreSQL w pamięci, bez zmian w produkcji).
-
-Na macOS możesz otworzyć projekt z terminala:
-
-```sh
-cd /Users/pawelszabunio/Desktop/Code/Front-end/Projects/GameLogs/gamelogsV2
-code .
-npm run dev
-```
-
-## Gdzie edytować
-
-- `index.html` — biblioteka, formularz i sekcje strony głównej.
-- `pick-a-game/index.html` — ekran losowania pod `/pick-a-game/`.
-- `dice.html` — zgodność ze starymi linkami: przekierowanie do `/pick-a-game/`.
-- `routes.js` — porządkowanie adresów z zachowaniem parametrów i fragmentów.
-- `cover-loader.js` — pobranie i dekodowanie okładki przed pokazaniem wyniku losowania.
-- `style.css` — cały wygląd i responsywność; bez kompilatora Sass.
-- `script.js` — interfejs katalogu, dzienniki, filtry, oceny, eksport/import i losowanie.
-- `games.js` — początkowa kolekcja gier.
-- `storage.js` — zapis danych i okładek, odczyt oraz migracja starszej kolekcji.
-- `gallery.js` — slider: strzałki, przeciąganie, pasek oraz klawiatura.
-- `image-assets.js` — wygenerowana mapa lżejszych grafik, również dla starszych zapisów biblioteki.
-- `scripts/optimize-images.mjs` — konwersja oryginalnych grafik na WebP i warianty responsywne.
-- `account.js`, `cloud.js`, `config.js` — konta i połączenie z Supabase.
-- `supabase/schema.sql` — tabele, atomowy zapis, RLS i prywatne okładki.
-- `images/` — okładki oraz kadry z gier.
-- `scripts/dev.mjs` — lokalny serwer podglądu (nie jest backendem aplikacji).
-
-### Adresy bez `.html`
-
-Strona główna używa `/`, sekcje `/#library` i `/#journal`, a losowanie
-`/pick-a-game/`. Link do dziennika wybranej gry ma postać `/?game=ID`.
-Plik `pick-a-game/index.html` działa również po bezpośrednim wejściu
-i odświeżeniu na GitHub Pages — nie wymaga routingu SPA ani backendu.
-Stary `/dice.html` przekierowuje, a `/index.html` porządkuje się do `/`
-bez gubienia parametrów i fragmentów (także powrotów z logowania).
-Adresy e-mail Supabase nadal wracają do dotychczasowego `/index.html`;
-nie trzeba zmieniać listy dozwolonych adresów opisanej w KONTA.md.
-Po zmianie `scripts/dev.mjs` uruchom serwer ponownie przez `npm run dev`.
-
-Statusy i oceny początkowych gier to przykładowe dane. Dzienniki są początkowo
-puste; kliknij okładkę lub tytuł gry, aby dodać sesję. Przycisk Edytuj grę
-pozwala zmienić tytuł, status, ocenę i okładkę bez utraty notatek.
-Po zalogowaniu biblioteka konta zapisuje się w Supabase. Nowe konto jest puste;
-lokalną kolekcję przenosisz jawnie przyciskiem w panelu **Moje konto**.
-Przed testem kont ustaw adresy powrotu i zapoznaj się z ograniczeniem SMTP w KONTA.md.
-
-W trybie bez konta dane zapisują się w `localStorage`, a wgrane okładki w `IndexedDB`
-konkretnej przeglądarki i adresu. JPG, PNG i WebP do 10 MB są pomniejszane
-do maksymalnie 800 px i zapisywane jako WebP (cel 128 KB, twardy limit
-256 KB po kompresji; maks. 40 megapikseli na wejściu). W trybie lokalnym nie trafiają
-na serwer; po zalogowaniu są w prywatnym magazynie Supabase.
-Używaj konsekwentnie `http://localhost:5173`; inny port, `127.0.0.1`
-lub adres publiczny oznaczają osobny magazyn danych. Wyczyszczenie danych
-witryny usuwa zapisaną bibliotekę. Pliki HTML/CSS/JS nie zawierają Twoich
-lokalnych wpisów i wysłanie projektu na GitHub ich nie przeniesie.
-Użyj Eksportuj, a na nowym adresie Importuj, aby przenieść kolekcję,
-okładki i wpisy. Przed zastąpieniem biblioteki importem wyeksportuj obecną.
-
-Okładka Cyberpunk 2077 pochodzi z [zasobów Steam](https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900_2x.jpg).
-
-## Lżejsze grafiki i większa galeria
-
-Bez logowania pusta lokalna biblioteka pokazuje 15 domyślnych gier. To widok demo,
-nie dane automatycznie zapisywane lub przenoszone na konto. Dopiero nowa biblioteka
-konta zaczyna się pusta, z kafelkiem „Add your first game”. Zapisane wcześniej gry
-i wpisy pozostają bez zmian. Player journal pokazuje cztery wpisy w dwóch kolumnach;
-„Show more” odsłania kolejne (na telefonie jedna kolumna).
-Dolne przyciski Add a game / Pick from Want to play pojawiają się od 16 gier
-w aktualnie wyświetlanej liście; górne są dostępne zawsze.
-
-Bez logowania galeria pokazuje dotychczasowe 18 zoptymalizowanych zdjęć demonstracyjnych.
-Nie ma w niej przycisków dodawania, usuwania ani Refresh. Po zalogowaniu galeria jest
-osobista: dwa puste miejsca „Add your favourite screenshots”, przycisk Add screenshot,
-podpis do 100 znaków i osobny kosz przy każdym własnym zdjęciu (z potwierdzeniem).
-Przykładowe zdjęcia nie są kopiowane na konto. JPG/PNG/WebP do 10 MB i 40 megapikseli
-są konwertowane w przeglądarce do WebP, do 1920 px i 1 MB. Interfejs pozwala dodać
-do 100 zdjęć; limit rozmiaru pojedynczego pliku obowiązuje także w Supabase Storage.
-Zdjęcia konta są przechowywane w prywatnym bucket `game-screenshots`,
-a podpisy w tabeli `gamelogs_screenshots`. Adresy zdjęć odnawiają się automatycznie.
-W nowym projekcie Supabase uruchom także `supabase/gallery.sql`.
-Zdjęcia zapisane lokalnie w poprzedniej wersji pozostają w IndexedDB, lecz widok gościa
-ich teraz nie wyświetla i nie przenosi automatycznie na konto. Export/Import biblioteki
-nadal obejmuje gry, okładki i wpisy — nie jest kopią zapasową osobnej galerii.
-Usunięcie gry nie usuwa screenshotów. Oryginalne demo plików w images/ pozostaje w repo.
-
-Na komputerze galeria pokazuje dwa kadry 16:9, na telefonie jeden pełnej
-szerokości obszaru treści. Kliknięcie otwiera powiększenie na stronie; działają strzałki,
-klawiatura, Esc oraz kliknięcie poza oknem. Zdjęcie w powiększeniu nie jest
-przycinane. Dodawanie i wyświetlanie prywatnej galerii wymaga JavaScript.
-
-33 archiwalne grafiki demonstracyjne (15 okładek i 18 kadrów) mają zoptymalizowane wersje
-w `images/optimized/`. Oryginały i starsze wygenerowane pliki są zachowane.
-Okładki mają warianty do 96, 320, 480 i 640 px: małe miniatury dziennika nie
-pobierają pliku przeznaczonego do dużej okładki. Stare zapisane ścieżki (także
-adresy bezwzględne z tej samej domeny) są rozpoznawane; zewnętrzne adresy pozostają bez zmian.
-Galeria ma podglądy do 640 i 1280 px; większa wersja do 1920 px jest pobierana
-dopiero po otwarciu zdjęcia. Mniejsze oryginały nie są powiększane. `srcset` dobiera
-plik do ekranu, `loading="lazy"` odracza pobieranie galerii poniżej ekranu.
-Pierwsze pięć okładek ma `loading="eager"` i wysoki priorytet; obrazy mają zarezerwowane proporcje,
-żeby ograniczyć skakanie układu. Prywatne screenshoty nadal zachowują większą jakość
-(1920 px, do 1 MB). Istniejących plików użytkownika nie nadpisujemy automatycznie;
-ostrzejszy limit okładek obowiązuje nowe i ponownie wgrane okładki.
-Przy losowaniu pobieranie okładki zaczyna się podczas obrotu (nadal 550 ms).
-Wynik pojawia się po przygotowaniu obrazu; przy wolnym połączeniu prawa część
-pozostaje chwilę pusta. Po 2,5 s lub błędzie obrazu pojawia się stabilna okładka
-zastępcza, żeby niedostępny obraz nie blokował losowania.
-
-Po zmianie oryginałów uruchom:
+W terminalu folderu `gamelogsV2`, z Node.js 24 LTS:
 
 ```sh
 npm ci
-npm run images:optimize
-npm run check
-npm test
+npm run dev
 ```
 
-Generator odczytuje źródła okładek z `games.js`, a galerii z `data-original`
-w HTML. Aktualizuje warianty WebP, mapę `image-assets.js` i atrybuty obrazków
-w galerii. Wygenerowane pliki trzeba dodać do commita razem z kodem.
-Stare zapisane lokalnie i na koncie odwołania do wbudowanych okładek są
-przekierowane na lżejsze pliki przy odczycie, bez usuwania notatek czy ocen.
-The Walking Dead usunięto z domyślnej kolekcji. Z wcześniejszej lokalnej kopii
-znika tylko niezmieniony kafelek demonstracyjny bez wpisów; własne wpisy,
-zmienione metadane i biblioteki kont nie są automatycznie usuwane.
-
-## GitHub — połączenie jest już ustawione
-
-Uruchamiaj polecenia w folderze `gamelogsV2`:
+Otwórz **http://localhost:5173/** w Chrome. Vite automatycznie odświeża zmienione komponenty.
+Zatrzymanie: `Ctrl+C`. Port nie zmienia się automatycznie. `127.0.0.1`, inny port i publiczna domena
+mają osobne dane przeglądarki — konsekwentnie używaj `localhost:5173`.
+Stary serwer sprzed migracji trzeba zatrzymać przed uruchomieniem Vite.
 
 ```sh
-git remote -v
-git status
+npm run check    # ścisła kontrola TypeScript
+npm run build    # kontrola typów + produkcyjne pliki w dist/
+npm run preview  # lokalny podgląd gotowego dist/ na porcie 4173
+npm run format  # formatowanie nowego kodu
 ```
 
-`origin` powinien wskazywać na `https://github.com/Anveth/Anveth.github.io`.
-Nie twórz repozytorium `gamelogsV2` na GitHubie — korzystamy z istniejącego,
-żeby zachować dotychczasowy adres strony. Nie trzeba wykonywać `git init`.
+`npm test` uruchamia nowe testy usług TypeScript i istniejące izolowane testy SQL w PGlite.
+Nie łączy się z produkcyjną bazą. Testy UI/kont wymagają osobnej weryfikacji w przeglądarce.
+`npm run test:legacy` to archiwalne testy poprzedniej implementacji — nie są kryterium odbioru Reacta.
 
-## Publikacja — dopiero gdy chcesz zastąpić obecną stronę
+## Kod
 
-Najpierw obejrzyj różnice w Source Control w VS Code lub przez `git diff`.
-W terminalu projektu:
+- `src/main.tsx`, `src/App.tsx` — wejście aplikacji, nawigacja, motyw i obsługa błędów.
+- `src/components/` — biblioteka, formularze, dziennik, galeria, konto i kostka.
+- `src/state/library.ts` — stan biblioteki, zapisy oraz rozdzielenie danych konta i gościa.
+- `src/services/` — walidacja, localStorage/IndexedDB, import/eksport, Supabase i obrazy.
+- `src/types.ts` — wspólne typy danych.
+- `style.css` — dotychczasowy wygląd i responsywność.
+- `games.js`, `image-assets.js`, `gallery-demo.js` — zachowane dane demonstracyjne i mapa grafik.
+- `config.js` — dotychczasowa publiczna konfiguracja Supabase; opcjonalnie zmienne `VITE_*` z `.env.example`.
+- `supabase/` — istniejący SQL, RLS i prywatne magazyny. Migracja frontendu ich nie zmienia.
+- `scripts/` — Vite, przygotowanie publikowanych zasobów i optymalizacja obrazów.
+- `.github/workflows/deploy.yml` — kompilacja i publikacja **wyłącznie gałęzi main**.
 
-```sh
-git add README.md PUBLIKACJA.md KONTA.md index.html dice.html style.css script.js games.js storage.js gallery.js image-assets.js account.js cloud.js config.js package.json package-lock.json scripts images/optimized tests supabase
-git diff --cached --stat
-git commit -m "Improve gallery and optimize images"
-git pull --rebase origin main
-git push origin main
-```
+Stare pliki `script.js`, `storage.js`, `cloud.js`, `account.js`, `gallery.js`, `personal-gallery.js`,
+`screenshots.js` i `cover-loader.js` pozostają do porównania podczas odbioru. Nie sterują nowym interfejsem
+i nie są kopiowane do `dist/`. `routes.js` obsługuje jeszcze stare przekierowanie `dice.html`.
 
-Jeśli `pull --rebase` zgłosi konflikt, rozwiąż go przed `push`; nie używaj
-`--force`. Przy pierwszym wysyłaniu GitHub może poprosić o zalogowanie.
-VS Code oferuje logowanie do GitHub przy **Source Control → Sync Changes**.
+## Dane i zachowane funkcje
 
-Na GitHubie: repozytorium **Anveth/Anveth.github.io → Settings → Pages**.
-Dla tej statycznej wersji ustaw **Deploy from a branch → main → /(root)**.
-Jeżeli takie ustawienia są już aktywne, pozostaw je. Po `push` sprawdź
-postęp publikacji w zakładce **Actions**. Nowa wersja zastąpi stronę pod
-**https://anveth.github.io/**; stare pliki pozostaną lokalnie w osobnym
-folderze oraz w historii repozytorium.
+Bez logowania pusta lokalna biblioteka pokazuje **15 demonstracyjnych gier**, a galeria **18 zdjęć**.
+Demo nie jest automatycznie zapisywane ani przenoszone na konto. Nowe konto zaczyna się puste:
+„Add your first game” i dwa miejsca „Add your favourite screenshots”.
 
-Nie wykonano automatycznej publikacji podczas wydzielania projektu.
+Zachowane są `gamelogs:library`, baza IndexedDB `gamelogs-media`, motyw, format kopii JSON `version: 1`
+i domyślna sesja Supabase. Migracja nie czyści pamięci i nie uruchamia SQL. Bibliotekę lokalną przenosi się
+na konto tylko jawnym przyciskiem w panelu konta; duplikaty identyfikatorów są pomijane.
 
-Źródło: [Konfiguracja publikacji GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+Gry mają jeden rating niezależny od statusu, rok bez oznaczenia platformy, edycję i usuwanie z potwierdzeniem.
+Dziennik pokazuje cztery wpisy z opcją „Show more”. Dolne przyciski biblioteki pojawiają się od 16 widocznych gier.
+Galeria konta obsługuje dodawanie i usuwanie pojedynczych zdjęć, bez przycisku Refresh.
+Eksport/import obejmuje gry, wpisy i okładki — **nie osobną galerię screenshotów**.
+
+## Grafiki
+
+W bibliotece, szczegółach i przy losowaniu wbudowane okładki używają oryginałów z `images/`,
+bez dodatkowej stratnej kompresji — priorytetem jest jakość. Pierwsze pięć ładuje się od razu,
+pozostałe później. Miniatury dziennika mają 56 px szerokości. Własne i wbudowane okładki są do nich
+pomniejszane z wygładzaniem pod gęstość ekranu, do tymczasowego, bezstratnego PNG w przeglądarce.
+Nie nadpisuje to plików okładek. Zewnętrzne adresy bez dostępu CORS pozostają wyświetlane bezpośrednio.
+Mapowanie rozpoznaje także wcześniej zapisane zoptymalizowane ścieżki, bez zmieniania danych gier.
+Prywatne okładki pobierane są w pobliżu widocznego obszaru; przywrócenie oryginałów dotyczy
+wbudowanych grafik, nie odzyskuje jakości wcześniej skompresowanych prywatnych plików.
+Galeria demo używa podglądów do 1280 px, pełnych obrazów do 1920 px dopiero po otwarciu.
+
+Nowe pliki JPG/PNG/WebP do 10 MB i 40 megapikseli są kompresowane w przeglądarce:
+
+- okładki: do 800 px, cel 128 KB, twardy limit 256 KB;
+- screenshoty: do 1920 px, cel 650 KB, twardy limit 1 MB, do 100 zdjęć w interfejsie.
+
+Adresy zewnętrznych obrazów nie są kompresowane. Istniejące prywatne pliki nie są masowo nadpisywane.
+Kostka zachowuje animację 550 ms, przygotowuje wybraną okładkę przed wynikiem i po maksymalnie 2,5 s
+używa stabilnego zamiennika, jeśli obraz nie jest gotowy.
+
+Po zmianie grafik źródłowych można uruchomić `npm run images:optimize`.
+Generator czyta źródła z `games.js` oraz istniejącego manifestu galerii `image-assets.js`, aktualizując WebP i mapę.
+Nie uruchamiaj go tylko z powodu migracji Reacta — obecne zasoby są już przygotowane.
+
+## Adresy i publikacja
+
+Zostają `/`, `/#library`, `/#journal`, `/?game=ID` i `/pick-a-game/`. Galeria ma skrót `/#gallery` w menu.
+Stare `.html` przekierowują lub porządkują się bez utraty parametrów i fragmentów.
+E-maile Supabase nadal wracają do `/index.html`; istniejąca lista dozwolonych adresów pozostaje aktualna.
+
+Publiczna strona: [anveth.github.io](https://anveth.github.io/).
+Repozytorium pozostaje `Anveth/Anveth.github.io`, niezależnie od lokalnej nazwy folderu.
+Nie zmieniaj ustawień publikacji przed odbiorem migracji.
+
+- [Publikacja wersji React](PUBLIKACJA.md)
+- [Odbiór migracji i zgodność danych](MIGRATION.md)
+- [Konta i konfiguracja Supabase](KONTA.md)
+
+Okładka Cyberpunk 2077 pochodzi z [zasobów Steam](https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900_2x.jpg).

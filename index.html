@@ -3,93 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="/">
     <meta name="description" content="GameLogs — your personal game library and journal.">
     <title>GameLogs — my library</title>
-    <link rel="stylesheet" href="style.css?v=20261021-8">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js?v=20261021-3"></script>
+    <script type="module" src="/src/main.tsx"></script>
 </head>
-<body data-page="library">
-    <header class="site-header">
-        <div class="nav-shell">
-            <a class="brand" href="/" aria-label="GameLogs — home">Game<span>Logs</span></a>
-            <nav class="primary-nav" aria-label="Main navigation">
-                <a class="is-active" href="/#library">Library</a>
-                <a href="/#journal">Journal</a>
-                <a href="/pick-a-game/">Pick a game</a>
-            </nav>
-            <div class="header-actions"><button class="button button-secondary account-button" id="accountButton" type="button">Log in</button><button class="icon-button" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false"><img id="themeIcon" src="svg/sun.png" alt=""></button></div>
-        </div>
-    </header>
-    <main>
-        <section class="library-section page-width" id="library" aria-labelledby="libraryTitle">
-            <div class="section-heading library-heading">
-                <div class="section-title-group"><h1 id="libraryTitle" tabindex="-1">Library</h1><p class="section-caption">Your gaming journal</p></div>
-                <div class="library-tools"><p class="game-count" id="gameCount" aria-live="polite"></p><button class="text-button" id="exportLibrary" type="button">Export</button><label class="text-button import-label">Import<input id="importLibrary" type="file" accept="application/json,.json"></label></div>
-                <div class="filter-bar" aria-label="Filter library">
-                    <button class="filter-button is-selected" type="button" data-filter="all" aria-pressed="true">All</button>
-                    <button class="filter-button" type="button" data-filter="playing" aria-pressed="false">Playing</button>
-                    <button class="filter-button" type="button" data-filter="backlog" aria-pressed="false">Want to play</button>
-                    <button class="filter-button" type="button" data-filter="completed" aria-pressed="false">Completed</button>
-                </div>
-                <div class="library-primary-actions"><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="/pick-a-game/">Pick from Want to play</a></div>
-            </div>
-            <p class="app-message" id="appMessage" role="status" hidden></p>
-            <div class="game-grid" id="gameGrid" aria-live="polite"></div>
-            <div class="library-actions" id="libraryBottomActions" role="group" aria-label="Library actions" hidden><button class="button button-primary" type="button" data-open-dialog>Add a game</button><a class="button button-secondary" href="/pick-a-game/">Pick from Want to play</a></div>
-        </section>
-        <section class="journal-section page-width" id="journal" aria-labelledby="journalTitle">
-            <div class="section-heading journal-heading"><div class="section-title-group"><h2 id="journalTitle">Player journal</h2><p class="section-caption">Your stories</p></div><p class="journal-count" id="journalCount" role="status"></p></div>
-            <div id="recentNotes" class="recent-notes"><p class="empty-state">Open a game and write about your first session.</p></div>
-            <div class="journal-pagination"><button class="button button-secondary" id="showMoreEntries" type="button" aria-controls="recentNotes" hidden>Show more</button></div>
-        </section>
-        <section class="gallery-section" aria-labelledby="galleryTitle" aria-roledescription="carousel">
-            <div class="page-width">
-                <div class="section-heading gallery-heading"><div class="section-title-group"><h2 id="galleryTitle">Gallery</h2><p class="section-caption">In-game moments</p></div><div class="gallery-controls"><span id="galleryCounter" class="gallery-counter">1–2 / 18</span><button class="icon-button gallery-arrow" id="galleryPrevious" type="button" aria-label="Previous screenshots" aria-controls="galleryTrack" disabled>←</button><button class="icon-button gallery-arrow" id="galleryNext" type="button" aria-label="Next screenshots" aria-controls="galleryTrack">→</button></div></div>
-                <div class="gallery-tools"><p class="gallery-hint" id="galleryHint">Your favourite screenshots. Select an image to view it full size.</p><button class="button button-secondary" id="addScreenshot" type="button" hidden disabled>Add screenshot</button></div>
-                <p class="app-message" id="galleryMessage" role="status" hidden></p>
-                <div class="gallery-track" id="galleryTrack" tabindex="0" role="region" aria-label="Screenshot gallery" aria-describedby="galleryHint"></div>
-                <input class="gallery-progress" id="galleryProgress" type="range" min="0" max="1000" value="0" step="1" aria-label="Scroll gallery">
-            </div>
-        </section>
-    </main>
-    <dialog class="game-dialog" id="gameDialog" aria-labelledby="dialogTitle">
-        <form id="gameForm">
-            <div class="dialog-heading"><div><h2 id="dialogTitle">Add a game</h2><p class="dialog-caption">Your library</p></div><button class="close-button" type="button" data-close-dialog aria-label="Close form">×</button></div>
-            <div class="form-grid">
-                <label>Game title<input name="title" type="text" autocomplete="off" required maxlength="80" placeholder="e.g. Hades II"></label>
-                <label>Release year<input name="year" type="number" min="1958" max="2100" placeholder="2026"></label>
-                <label>Status<select name="status"><option value="backlog">Want to play</option><option value="playing">Playing</option><option value="completed">Completed</option></select></label>
-                <label>Rating (1–10, optional)<input name="rating" type="number" min="1" max="10" step="1" placeholder="—"></label>
-                <label>Upload cover (max. 10 MB)<input id="coverFile" name="coverFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="coverHelp"></label>
-                <label class="form-wide">Or a cover image URL<input name="image" type="url" inputmode="url" placeholder="https://..."></label>
-                <div class="cover-preview-row form-wide"><div class="cover-preview" id="coverPreview" aria-label="Cover preview"></div><p id="coverHelp">JPG, PNG or WebP up to 10 MB and 40 megapixels. Covers are resized to 800 px and converted to WebP (target 128 KB, max. 256 KB). Oversized files are rejected with an explanation. External image URLs are not converted. A cover is optional.</p><button class="text-button" id="clearCover" type="button">Remove cover</button></div>
-            </div>
-            <p class="form-error" id="gameFormError" role="alert" hidden></p>
-            <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog>Cancel</button><button class="button button-primary" id="saveGame" type="submit">Save to library</button></div>
-        </form>
-    </dialog>
-    <dialog class="game-dialog detail-dialog" id="detailDialog" aria-labelledby="detailTitle">
-        <div class="detail-content">
-            <div class="dialog-heading detail-toolbar"><p class="dialog-caption">Your journal</p><button class="close-button" type="button" data-close-detail aria-label="Close journal">×</button></div>
-            <div id="detailHeader" class="detail-header"></div>
-            <div class="detail-actions"><button class="text-button" id="editGame" type="button">Edit game and cover</button><button class="text-button danger-text" id="deleteGame" type="button">Delete game</button></div>
-            <form id="noteForm" class="note-form">
-                <h3>New entry</h3>
-                <label for="noteText">What will you remember from this session?</label>
-                <textarea id="noteText" name="text" rows="4" maxlength="5000" required placeholder="Impressions, progress, a favourite moment…"></textarea>
-                <div class="note-fields"><label>Session date<input id="noteDate" name="date" type="date" required></label><label>Play time (min, optional)<input name="minutes" type="number" min="1" max="1440" step="1" placeholder="e.g. 60"></label></div>
-                <p class="form-error" id="noteFormError" role="alert" hidden></p>
-                <button class="button button-primary" type="submit">Save entry</button>
-            </form>
-            <section class="note-history" aria-labelledby="notesTitle"><h3 id="notesTitle" tabindex="-1">Session history</h3><div id="noteList" aria-live="polite"></div></section>
-        </div>
-    </dialog>
-    <dialog class="game-dialog confirm-dialog" id="deleteDialog" aria-labelledby="deleteTitle" aria-describedby="deleteDescription"><div class="detail-content"><h2 id="deleteTitle">Delete game?</h2><p class="dialog-caption">Library management</p><p id="deleteDescription"></p><blockquote id="deleteEntryPreview" class="delete-preview" hidden></blockquote><p class="form-error" id="deleteError" role="alert" hidden></p><div class="dialog-actions"><button class="button button-secondary" id="cancelDelete" type="button">Cancel</button><button class="button button-danger" id="confirmDelete" type="button">Delete game</button></div></div></dialog>
-    <dialog class="game-dialog" id="importDialog" aria-labelledby="importTitle"><div class="detail-content"><h2 id="importTitle">Restore library?</h2><p id="importSummary"></p><p>Import replaces your current library. Export it first if you want to keep a backup.</p><p class="form-error" id="importError" role="alert" hidden></p><div class="dialog-actions"><button class="button button-secondary" id="cancelImport" type="button">Cancel</button><button class="button button-primary" id="confirmImport" type="button">Restore library</button></div></div></dialog>
-    <footer class="site-footer"><p><span class="footer-brand">Game<span class="footer-brand-accent">Logs</span></span><span class="footer-tagline">Your <span class="footer-gaming">gaming</span> journal</span></p></footer>
-</body>
+<body><div id="root"></div><noscript>GameLogs needs JavaScript. Your saved data has not been changed.</noscript></body>
 </html>

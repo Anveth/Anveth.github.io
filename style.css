@@ -18,6 +18,9 @@
 }
 
 * { box-sizing: border-box; }
+#root { display: flex; flex: 1; flex-direction: column; min-height: 100dvh; min-width: 0; }
+fieldset.form-grid { min-width: 0; padding: 0; margin-inline: 0; border: 0; }
+.cover-preview > .detail-cover { width: 100%; height: 100%; }
 [hidden] { display: none !important; }
 
 html { scroll-behavior: smooth; }
@@ -118,7 +121,7 @@ img { display: block; max-width: 100%; }
 }
 
 .primary-nav a:hover,
-.primary-nav a.is-active { color: var(--text); background: var(--accent-soft); }
+.primary-nav a:focus-visible { color: var(--text); background: var(--accent-soft); }
 
 .icon-button {
     display: grid;
@@ -165,7 +168,7 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 
 .library-section { padding-block: 56px 104px; }
 .library-heading h1 { max-width: none; font-size: clamp(28px, 4vw, 42px); }
-.library-section, .journal-section { scroll-margin-top: 130px; }
+.library-section, .journal-section, .gallery-section { scroll-margin-top: 130px; }
 
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
 .library-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title tools" "filters actions"; align-items: center; gap: 40px 24px; margin-bottom: 40px; }
@@ -229,7 +232,7 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 .journal-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .cover-button { display: block; width: 100%; padding: 0; border: 0; border-radius: 12px; background: transparent; text-align: left; transition: transform 220ms ease; }
 @media (hover: hover) {
-    .game-card:has(.cover-button:hover, .game-title:hover) .cover-button { transform: translateY(-7px) scale(1.025); }
+    .game-card:has(.cover-button:hover, .game-title:hover) .cover-button { transform: translateY(-7px); }
 }
 
 .cover-placeholder { display: grid; place-items: center; background: linear-gradient(145deg, var(--accent), var(--surface-raised)); color: var(--text); }
@@ -287,8 +290,8 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 .journal-empty p { max-width: 540px; margin: 14px 0 0; color: var(--muted); font-size: 16px; line-height: 1.75; }
 .journal-entry { display: flex; flex-direction: column; min-width: 0; gap: 16px; padding: 24px 0 8px; border-top: 1px solid var(--line); }
 .journal-entry-date { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-.journal-entry-header { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 14px; }
-.journal-cover-button { display: block; width: 44px; padding: 0; border: 0; border-radius: 6px; background: transparent; }
+.journal-entry-header { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 14px; }
+.journal-cover-button { display: block; width: 56px; padding: 0; border: 0; border-radius: 6px; background: transparent; }
 .journal-cover { position: relative; overflow: hidden; aspect-ratio: 2 / 3; border-radius: 6px; background: var(--surface-raised); }
 .journal-cover.cover-placeholder span { font-size: 20px; }
 .journal-entry-body { min-width: 0; }
@@ -321,13 +324,9 @@ h2 { font-size: clamp(28px, 4vw, 42px); }
 .gallery-track::-webkit-scrollbar { display: none; }
 .gallery-track.is-dragging, .gallery-track.is-dragging a { cursor: grabbing; }
 .gallery-frame { position: relative; min-width: 0; }
-.screenshot-remove { position: absolute; inset: 12px 12px auto auto; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #ffffff40; border-radius: 9px; background: #141413e6; color: #fff; cursor: pointer; }
-.screenshot-remove:hover { background: #682d34; }
-.screenshot-remove:disabled { cursor: wait; opacity: .5; }
 .gallery-item { position: relative; display: block; overflow: hidden; border-radius: 12px; background: var(--surface); cursor: grab; }
-.gallery-track img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; transition: transform .35s ease; pointer-events: none; }
+.gallery-track img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; pointer-events: none; }
 .gallery-item span { position: absolute; inset: auto 0 0; padding: 32px 16px 15px; background: linear-gradient(transparent, rgba(0, 0, 0, .85)); color: #fff; font-size: 13px; pointer-events: none; }
-@media (hover: hover) { .gallery-item:hover img { transform: scale(1.035); } }
 .gallery-progress { display: block; width: 100%; height: 32px; margin: 15px 0 0; background: transparent; cursor: ew-resize; appearance: none; accent-color: var(--accent); }
 .gallery-progress::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: var(--line); }
 .gallery-progress::-webkit-slider-thumb { width: clamp(40px, 16%, 160px); height: 8px; margin-top: -2px; border-radius: 8px; background: var(--accent); appearance: none; }
