@@ -68,7 +68,9 @@ Eksport/import obejmuje gry, wpisy i okładki — **nie osobną galerię screens
 
 W bibliotece, szczegółach i przy losowaniu wbudowane okładki używają oryginałów z `images/`,
 bez dodatkowej stratnej kompresji — priorytetem jest jakość. Pierwsze pięć ładuje się od razu,
-pozostałe później. Małe miniatury dziennika nadal używają WebP i `srcset` (najmniejszy wariant 96 px).
+pozostałe później. Miniatury dziennika mają 56 px szerokości. Własne i wbudowane okładki są do nich
+pomniejszane z wygładzaniem pod gęstość ekranu, do tymczasowego, bezstratnego PNG w przeglądarce.
+Nie nadpisuje to plików okładek. Zewnętrzne adresy bez dostępu CORS pozostają wyświetlane bezpośrednio.
 Mapowanie rozpoznaje także wcześniej zapisane zoptymalizowane ścieżki, bez zmieniania danych gier.
 Prywatne okładki pobierane są w pobliżu widocznego obszaru; przywrócenie oryginałów dotyczy
 wbudowanych grafik, nie odzyskuje jakości wcześniej skompresowanych prywatnych plików.
@@ -89,7 +91,7 @@ Nie uruchamiaj go tylko z powodu migracji Reacta — obecne zasoby są już przy
 
 ## Adresy i publikacja
 
-Zostają `/`, `/#library`, `/#journal`, `/?game=ID` i `/pick-a-game/`.
+Zostają `/`, `/#library`, `/#journal`, `/?game=ID` i `/pick-a-game/`. Galeria ma skrót `/#gallery` w menu.
 Stare `.html` przekierowują lub porządkują się bez utraty parametrów i fragmentów.
 E-maile Supabase nadal wracają do `/index.html`; istniejąca lista dozwolonych adresów pozostaje aktualna.
 

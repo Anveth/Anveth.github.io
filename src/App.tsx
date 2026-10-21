@@ -53,7 +53,7 @@ export function App() {
         if (loading) return;
         const aliases: Record<string, string> = { '#biblioteka': '#library', '#dziennik': '#journal' };
         const hash = aliases[location.hash] || location.hash;
-        if (hash === '#library' || hash === '#journal') {
+        if (hash === '#library' || hash === '#journal' || hash === '#gallery') {
             if (hash !== location.hash)
                 history.replaceState(history.state, '', `${location.pathname}${location.search}${hash}`);
             document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'instant' });
@@ -67,13 +67,10 @@ export function App() {
                         Game<span>Logs</span>
                     </a>
                     <nav className="primary-nav" aria-label="Main navigation">
-                        <a className={!picker ? 'is-active' : undefined} href="/#library">
-                            Library
-                        </a>
+                        <a href="/#library">Library</a>
                         <a href="/#journal">Journal</a>
-                        <a className={picker ? 'is-active' : undefined} href="/pick-a-game/">
-                            Pick a game
-                        </a>
+                        <a href="/#gallery">Gallery</a>
+                        <a href="/pick-a-game/">Pick a game</a>
                     </nav>
                     <div className="header-actions">
                         <button

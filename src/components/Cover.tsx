@@ -2,6 +2,30 @@ import { useEffect, useRef, useState } from 'react';
 import type { Game } from '../types';
 import { imageAsset, originalImage, safeImage } from '../services/storage';
 import { libraryStore, useLibrary } from '../state/library';
+import { journalThumbnail } from '../services/thumbnails';
+
+function useJournalThumbnail(source: string, enabled: boolean): string {
+    const [thumbnail, setThumbnail] = useState<{ source: string; url: string } | null>(null);
+    useEffect(() => {
+        if (!enabled || !source) return;
+        let active = true,
+            objectURL = '';
+        void journalThumbnail(source)
+            .then((blob) => {
+                if (!blob || !active) return;
+                objectURL = URL.createObjectURL(blob);
+                setThumbnail({ source, url: objectURL });
+            })
+            .catch(() => {
+                // Keep the existing image if resampling is unavailable or blocked.
+            });
+        return () => {
+            active = false;
+            if (objectURL) URL.revokeObjectURL(objectURL);
+        };
+    }, [source, enabled]);
+    return enabled && thumbnail?.source === source ? thumbnail.url : source;
+}
 
 export function Cover({
     game,
@@ -17,8 +41,7 @@ export function Cover({
     const { covers } = useLibrary(),
         ref = useRef<HTMLDivElement>(null);
     const image = showImage ? (game.imageKey ? covers[game.imageKey] || '' : safeImage(game.image)) : '';
-    const asset = imageAsset(image),
-        responsive = asset && className === 'journal-cover';
+    const asset = imageAsset(image);
     const [failed, setFailed] = useState(false);
     useEffect(() => setFailed(false), [image]);
     useEffect(() => {
@@ -52,19 +75,14 @@ export function Cover({
             observer.disconnect();
         };
     }, [game.imageKey, image, showImage]);
-    const fallback = responsive ? asset.sizes[0]?.src : asset ? originalImage(image) : image;
+    const source = asset ? originalImage(image) : image;
+    const displayedImage = useJournalThumbnail(source, className === 'journal-cover');
     return (
         <div ref={ref} className={`${className} cover-placeholder`}>
             <span aria-hidden="true">{game.title.charAt(0).toUpperCase()}</span>
             {image && !failed && (
                 <img
-                    src={fallback}
-                    srcSet={
-                        responsive
-                            ? asset.sizes.map((size) => `${size.src} ${size.width}w`).join(', ')
-                            : undefined
-                    }
-                    sizes={responsive ? '44px' : undefined}
+                    src={displayedImage}
                     alt={`Cover for ${game.title}`}
                     loading={eager ? 'eager' : 'lazy'}
                     fetchPriority={eager ? 'high' : 'auto'}

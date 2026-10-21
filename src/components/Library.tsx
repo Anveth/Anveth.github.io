@@ -111,9 +111,6 @@ export function Library() {
                                     setExporting(true);
                                     try {
                                         await libraryStore.exportBackup();
-                                        libraryStore.notify(
-                                            'Library exported with your journal entries and custom covers.'
-                                        );
                                     } catch (error) {
                                         libraryStore.notify(errorMessage(error), true);
                                     } finally {
@@ -160,7 +157,7 @@ export function Library() {
                         </div>
                         <LibraryActions add={add} />
                     </div>
-                    {notice && (
+                    {notice?.error && (
                         <p
                             className={`app-message${notice.error ? ' is-error' : ''}`}
                             id="appMessage"
@@ -292,9 +289,6 @@ export function Library() {
                                         await libraryStore.restore(imported);
                                         setImported(null);
                                         setFilter('all');
-                                        libraryStore.notify(
-                                            'Library, custom covers and journal entries restored.'
-                                        );
                                     } catch (error) {
                                         setImportError(errorMessage(error));
                                     }

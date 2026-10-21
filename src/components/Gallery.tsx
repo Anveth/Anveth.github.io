@@ -248,7 +248,12 @@ export function Gallery() {
         dragged.current = false;
     };
     return (
-        <section className="gallery-section" aria-labelledby="galleryTitle" aria-roledescription="carousel">
+        <section
+            className="gallery-section"
+            id="gallery"
+            aria-labelledby="galleryTitle"
+            aria-roledescription="carousel"
+        >
             <div className="page-width">
                 <div className="section-heading gallery-heading">
                     <div className="section-title-group">
@@ -374,29 +379,6 @@ export function Gallery() {
                                 />
                                 <span>{photo.caption || 'Screenshot'}</span>
                             </a>
-                            {remote && (
-                                <button
-                                    className="screenshot-remove"
-                                    aria-label={`Delete screenshot: ${photo.caption || 'Screenshot'}`}
-                                    disabled={!ready || busy}
-                                    onClick={() => {
-                                        setError('');
-                                        setDeletion(photo.id);
-                                    }}
-                                >
-                                    <svg
-                                        width="18"
-                                        height="18"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.7"
-                                        aria-hidden="true"
-                                    >
-                                        <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
-                                    </svg>
-                                </button>
-                            )}
                         </div>
                     ))}
                     {remote &&
@@ -479,7 +461,7 @@ export function Gallery() {
                                 const next = await store.list();
                                 libraryStore.assertScope(epoch);
                                 setPhotos(next);
-                                setMessage('Screenshot saved.');
+                                setMessage('');
                             } catch (error) {
                                 if (epoch !== libraryStore.scope()) return;
                                 if (saved)
@@ -603,7 +585,7 @@ export function Gallery() {
                                             photos.filter((photo) => photo.id !== deletion)
                                         );
                                         setDeletion(null);
-                                        setMessage(warning || 'Screenshot deleted.');
+                                        setMessage(warning);
                                     } catch (error) {
                                         if (epoch === libraryStore.scope()) setError(errorMessage(error));
                                     } finally {
