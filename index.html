@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js?v=20261021-2"></script>
+    <script type="module" src="script.js?v=20261021-3"></script>
 </head>
 <body data-page="library">
     <header class="site-header">
@@ -66,7 +66,7 @@
                 <label>Rating (1–10, optional)<input name="rating" type="number" min="1" max="10" step="1" placeholder="—"></label>
                 <label>Upload cover (max. 10 MB)<input id="coverFile" name="coverFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="coverHelp"></label>
                 <label class="form-wide">Or a cover image URL<input name="image" type="url" inputmode="url" placeholder="https://..."></label>
-                <div class="cover-preview-row form-wide"><div class="cover-preview" id="coverPreview" aria-label="Cover preview"></div><p id="coverHelp">JPG, PNG or WebP up to 10 MB and 40 megapixels. Uploads are automatically resized to 1200 px and converted to WebP (max. 512 KB after compression). Oversized files are rejected with an explanation. Image URLs are not converted. A cover is optional.</p><button class="text-button" id="clearCover" type="button">Remove cover</button></div>
+                <div class="cover-preview-row form-wide"><div class="cover-preview" id="coverPreview" aria-label="Cover preview"></div><p id="coverHelp">JPG, PNG or WebP up to 10 MB and 40 megapixels. Covers are resized to 800 px and converted to WebP (target 128 KB, max. 256 KB). Oversized files are rejected with an explanation. External image URLs are not converted. A cover is optional.</p><button class="text-button" id="clearCover" type="button">Remove cover</button></div>
             </div>
             <p class="form-error" id="gameFormError" role="alert" hidden></p>
             <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog>Cancel</button><button class="button button-primary" id="saveGame" type="submit">Save to library</button></div>

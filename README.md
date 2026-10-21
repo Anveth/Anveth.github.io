@@ -87,8 +87,8 @@ Przed testem kont ustaw adresy powrotu i zapoznaj się z ograniczeniem SMTP w KO
 
 W trybie bez konta dane zapisują się w `localStorage`, a wgrane okładki w `IndexedDB`
 konkretnej przeglądarki i adresu. JPG, PNG i WebP do 10 MB są pomniejszane
-do maksymalnie 1200 px i zapisywane jako WebP (zwykle do 300 KB, twardy limit
-512 KB po kompresji; maks. 40 megapikseli na wejściu). W trybie lokalnym nie trafiają
+do maksymalnie 800 px i zapisywane jako WebP (cel 128 KB, twardy limit
+256 KB po kompresji; maks. 40 megapikseli na wejściu). W trybie lokalnym nie trafiają
 na serwer; po zalogowaniu są w prywatnym magazynie Supabase.
 Używaj konsekwentnie `http://localhost:5173`; inny port, `127.0.0.1`
 lub adres publiczny oznaczają osobny magazyn danych. Wyczyszczenie danych
@@ -130,11 +130,17 @@ klawiatura, Esc oraz kliknięcie poza oknem. Zdjęcie w powiększeniu nie jest
 przycinane. Dodawanie i wyświetlanie prywatnej galerii wymaga JavaScript.
 
 33 archiwalne grafiki demonstracyjne (15 okładek i 18 kadrów) mają zoptymalizowane wersje
-w `images/optimized/`. Oryginały są zachowane. Galeria ma warianty szerokości
-do 640, 1280 i 1920 px, bez powiększania mniejszych oryginałów. `srcset` dobiera
+w `images/optimized/`. Oryginały i starsze wygenerowane pliki są zachowane.
+Okładki mają warianty do 96, 320, 480 i 640 px: małe miniatury dziennika nie
+pobierają pliku przeznaczonego do dużej okładki. Stare zapisane ścieżki (także
+adresy bezwzględne z tej samej domeny) są rozpoznawane; zewnętrzne adresy pozostają bez zmian.
+Galeria ma podglądy do 640 i 1280 px; większa wersja do 1920 px jest pobierana
+dopiero po otwarciu zdjęcia. Mniejsze oryginały nie są powiększane. `srcset` dobiera
 plik do ekranu, `loading="lazy"` odracza pobieranie galerii poniżej ekranu.
-Pierwsze cztery okładki mają `loading="eager"`; obrazy mają zarezerwowane proporcje,
-żeby ograniczyć skakanie układu. Zewnętrznych linków do obrazów nie konwertujemy.
+Pierwsze pięć okładek ma `loading="eager"` i wysoki priorytet; obrazy mają zarezerwowane proporcje,
+żeby ograniczyć skakanie układu. Prywatne screenshoty nadal zachowują większą jakość
+(1920 px, do 1 MB). Istniejących plików użytkownika nie nadpisujemy automatycznie;
+ostrzejszy limit okładek obowiązuje nowe i ponownie wgrane okładki.
 Przy losowaniu pobieranie okładki zaczyna się podczas obrotu (nadal 550 ms).
 Wynik pojawia się po przygotowaniu obrazu; przy wolnym połączeniu prawa część
 pozostaje chwilę pusta. Po 2,5 s lub błędzie obrazu pojawia się stabilna okładka

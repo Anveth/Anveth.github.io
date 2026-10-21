@@ -2,9 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import sharp from 'sharp';
+import { runInNewContext } from 'node:vm';
 import { IMAGE_ASSETS } from '../image-assets.js';
 import { DEFAULT_GAMES } from '../games.js';
-import { safeImage, normalizeGame, loadLibrary, validateCoverFile, prepareCover } from '../storage.js';
+import { safeImage, imageAsset, normalizeGame, loadLibrary, validateCoverFile, prepareCover } from '../storage.js';
 
 test('all shipped cover and gallery sources have decodable WebP assets and accurate dimensions', async () => {
     assert.equal(Object.keys(IMAGE_ASSETS).length, DEFAULT_GAMES.length + 18);
@@ -60,9 +61,45 @@ test('old built-in cover paths resolve to optimized images without replacing cus
     globalThis.window = { location: { href: 'https://example.test/index.html' } };
     try {
         assert.equal(safeImage('images/GoWR.png'), IMAGE_ASSETS['images/GoWR.png'].src);
+        assert.equal(safeImage('https://example.test/images/GoWR.png'), IMAGE_ASSETS['images/GoWR.png'].src);
+        assert.equal(safeImage('/images/GoWR.png'), IMAGE_ASSETS['images/GoWR.png'].src);
+        assert.deepEqual(imageAsset('images/optimized/covers/GoWR-444.webp'), IMAGE_ASSETS['images/GoWR.png']);
         assert.equal(safeImage('https://other.example/GoWR.png'), 'https://other.example/GoWR.png');
         assert.equal(safeImage('javascript:alert(1)'), '');
         assert.equal(normalizeGame({ id: 'cyberpunk', title: 'Cyberpunk', status: 'backlog', image: 'images/cyberpunk.jpg' }).image, IMAGE_ASSETS['images/cyberpunk-cover.jpg'].src);
+    } finally { delete globalThis.window; }
+});
+
+test('all 15 cover previews stay lightweight while retaining larger and tiny variants', () => {
+    let total = 0;
+    for (const game of DEFAULT_GAMES) {
+        const asset = IMAGE_ASSETS[game.image];
+        assert.ok(asset.sizes[0].width <= 96);
+        const preview = asset.sizes.find(size => size.width >= 320) || asset.sizes.at(-1);
+        total += preview.bytes;
+        assert.ok(preview.bytes <= 32 * 1024, game.title);
+        assert.ok(asset.sizes.at(-1).width <= 640);
+        assert.ok(asset.aliases.length > 0);
+    }
+    assert.ok(total <= 300 * 1024);
+});
+
+test('cover renderer uses responsive variants except for the already preloaded picker image', async () => {
+    const script = await readFile(new URL('../script.js', import.meta.url), 'utf8');
+    const renderer = script.match(/function gameCover\([^\n]*\) \{[\s\S]*?\n\}/)[0];
+    globalThis.window = { location: { href: 'https://example.test/' } };
+    try {
+        const render = runInNewContext(`${renderer}; gameCover;`, { safeImage, imageAsset, coverUrls: new Map(), escapeHtml: value => String(value) });
+        const game = DEFAULT_GAMES[0];
+        assert.match(render(game), /srcset="[^\"]+96w/);
+        assert.match(render(game, 'journal-cover'), /sizes="44px"/);
+        const picker = render(game, 'result-cover', true);
+        assert.ok(picker.includes(`src="${IMAGE_ASSETS[game.image].src}"`));
+        assert.doesNotMatch(picker, /srcset=/);
+        assert.doesNotMatch(render(game, 'result-cover', true, false), /<img/);
+        const custom = render({ title: 'Custom', image: 'https://other.example/cover.jpg' });
+        assert.match(custom, /src="https:\/\/other.example\/cover.jpg"/);
+        assert.doesNotMatch(custom, /srcset=/);
     } finally { delete globalThis.window; }
 });
 
@@ -82,7 +119,7 @@ test('cover compression scales images, retries quality, and releases temporary U
     const qualities = [];
     const canvas = { getContext: () => ({ drawImage() {} }), toBlob(callback, type, quality) {
         qualities.push(quality);
-        callback(new Blob([new Uint8Array(quality > .8 ? 400 * 1024 : 200 * 1024)], { type }));
+        callback(new Blob([new Uint8Array(quality > .8 ? 400 * 1024 : 100 * 1024)], { type }));
     } };
     globalThis.Image = class { naturalWidth = 2400; naturalHeight = 3600; async decode() {} };
     globalThis.document = { createElement: () => canvas };
@@ -91,11 +128,17 @@ test('cover compression scales images, retries quality, and releases temporary U
     try {
         const result = await prepareCover({ type: 'image/png', size: 1000 });
         assert.equal(result.type, 'image/webp');
-        assert.equal(result.size, 200 * 1024);
-        assert.equal(canvas.width, 800);
-        assert.equal(canvas.height, 1200);
+        assert.equal(result.size, 100 * 1024);
+        assert.equal(canvas.width, 533);
+        assert.equal(canvas.height, 800);
         assert.deepEqual(qualities, [.84, .76]);
         assert.equal(revoked, true);
+        qualities.length = 0;
+        const screenshot = await prepareCover({ type: 'image/png', size: 1000 }, { maxDimension: 1920, maxBytes: 1048576, targetBytes: 650 * 1024 });
+        assert.equal(screenshot.size, 400 * 1024);
+        assert.equal(canvas.width, 1280);
+        assert.equal(canvas.height, 1920);
+        assert.deepEqual(qualities, [.84]);
     } finally {
         globalThis.Image = originalImage;
         globalThis.document = originalDocument;

@@ -1,5 +1,5 @@
-import { setupPersonalGallery } from './personal-gallery.js?v=20261019-3';
-import { STATUSES, safeImage, normalizeGame, validDate, loadLibrary, loadGuestLibrary, saveLibrary, removeGame, removeEntry, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261019-2';
+import { setupPersonalGallery } from './personal-gallery.js?v=20261021-1';
+import { STATUSES, safeImage, imageAsset, normalizeGame, validDate, loadLibrary, loadGuestLibrary, saveLibrary, removeGame, removeEntry, coverStore as localCoverStore, validateCoverFile, prepareCover, blobToDataUrl, dataUrlToBlob } from './storage.js?v=20261021-1';
 import { createCloudStore } from './cloud.js?v=20261018-2';
 import { mountAccount } from './account.js?v=20261019-2';
 import { cleanPageURL } from './routes.js?v=20261018-1';
@@ -105,7 +105,14 @@ async function hydrateCovers() {
 
 function gameCover(game, className = 'game-cover', eager = false, showImage = true) {
     const image = showImage ? coverUrls.get(game.imageKey) || safeImage(game.image) : '';
-    return `<div class="${className} cover-placeholder"><span aria-hidden="true">${escapeHtml(game.title.charAt(0).toUpperCase())}</span>${image ? `<img src="${escapeHtml(image)}" alt="Cover for ${escapeHtml(game.title)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async" width="600" height="900">` : ''}</div>`;
+    const asset = imageAsset(image);
+    // The picker uses exactly the file already loaded by preloadCover: no second request on reveal.
+    const responsive = asset && className !== 'result-cover';
+    const sizes = className === 'journal-cover' ? '44px' : className === 'detail-cover' ? '(max-width: 650px) 80px, 108px'
+        : '(max-width: 650px) calc((100vw - 45px) / 2), (max-width: 920px) calc((100vw - 102px) / 4), (min-width: 2560px) 269px, (min-width: 1921px) calc(10vw + 13px), (min-width: 1168px) 210px, calc((100vw - 120px) / 5)';
+    const fallback = responsive ? (asset.sizes.find(size => size.width >= 320) || asset.sizes.at(-1)).src : image;
+    const sources = responsive ? ` srcset="${escapeHtml(asset.sizes.map(size => `${size.src} ${size.width}w`).join(', '))}" sizes="${sizes}"` : '';
+    return `<div class="${className} cover-placeholder"><span aria-hidden="true">${escapeHtml(game.title.charAt(0).toUpperCase())}</span>${image ? `<img src="${escapeHtml(fallback)}"${sources} alt="Cover for ${escapeHtml(game.title)}" loading="${eager ? 'eager' : 'lazy'}" fetchpriority="${eager ? 'high' : 'auto'}" decoding="async" width="${asset?.width || 600}" height="${asset?.height || 900}">` : ''}</div>`;
 }
 
 // Keep a useful placeholder if a linked image is unavailable.
@@ -122,7 +129,7 @@ function renderLibrary() {
     byId('gameCount').textContent = `${count} ${noun}`;
     byId('libraryBottomActions').hidden = count < 16;
     grid.innerHTML = games.length ? games.map((game, index) => `<article class="game-card">
-        <button class="cover-button" type="button" data-open-game="${escapeHtml(game.id)}" aria-label="Open journal: ${escapeHtml(game.title)}">${gameCover(game, 'game-cover', index < 4)}</button>
+        <button class="cover-button" type="button" data-open-game="${escapeHtml(game.id)}" aria-label="Open journal: ${escapeHtml(game.title)}">${gameCover(game, 'game-cover', index < 5)}</button>
         <div class="game-card-content">
             <button class="game-title" type="button" data-open-game="${escapeHtml(game.id)}">${escapeHtml(game.title)}</button>
             <p class="game-meta">${game.year || ''}</p>

@@ -1,4 +1,4 @@
-import { IMAGE_ASSETS } from './image-assets.js?v=20261018-2';
+import { IMAGE_ASSETS } from './image-assets.js?v=20261021-1';
 
 // Public showcase only. Never insert these screenshots into a user's account.
 const titles = [
@@ -15,7 +15,7 @@ const titles = [
 export const DEMO_SCREENSHOTS = titles.map(([file, caption], index) => {
     const asset = IMAGE_ASSETS[`images/slider/${file}`];
     return { id: `demo-${index + 1}`, caption, url: asset.src, thumbnail: asset.sizes[0].src,
-        srcset: asset.sizes.map(size => `${size.src} ${size.width}w`).join(', ') };
+        srcset: asset.sizes.filter(size => size.width <= 1280).map(size => `${size.src} ${size.width}w`).join(', ') };
 });
 
 const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));

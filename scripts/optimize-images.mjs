@@ -21,16 +21,19 @@ for (const [kind, sources] of [['covers', DEFAULT_GAMES.map(game => game.image)]
         const stem = basename(source, extname(source));
         const widths = kind === 'gallery'
             ? [...new Set([640, 1280, 1920].map(width => Math.min(width, metadata.width)))]
-            : [Math.min(640, metadata.width)];
+            : [...new Set([96, 320, 480, 640].map(width => Math.min(width, metadata.width)))];
         const sizes = [];
         for (const width of widths) {
-            const target = `${folder}/${stem}-${width}.webp`;
-            const pipeline = sharp(sourcePath).rotate().resize({ width, ...(kind === 'covers' ? { height: 960, fit: 'inside' } : {}), withoutEnlargement: true });
-            const info = await pipeline.webp({ quality: kind === 'gallery' ? 80 : 82, effort: 5 }).toFile(resolve(root, target));
+            const target = `${folder}/${stem}-${width}-v2.webp`;
+            const pipeline = sharp(sourcePath).rotate().resize({ width, ...(kind === 'covers' ? { height: Math.round(width * 1.5), fit: 'inside' } : {}), withoutEnlargement: true });
+            const quality = kind === 'gallery' ? (width > 1280 ? 84 : 80) : 74;
+            const info = await pipeline.webp({ quality, effort: 6 }).toFile(resolve(root, target));
             sizes.push({ src: target, width: info.width, height: info.height, bytes: info.size });
         }
         const full = sizes.at(-1);
-        manifest[source] = { src: full.src, width: full.width, height: full.height, sizes };
+        const aliases = [...new Set([...(IMAGE_ASSETS[source]?.aliases || []), ...(IMAGE_ASSETS[source]?.sizes || []).map(size => size.src)])]
+            .filter(path => !sizes.some(size => size.src === path));
+        manifest[source] = { src: full.src, width: full.width, height: full.height, sizes, aliases };
         before += sourceBytes;
         after += full.bytes;
         console.log(`${source}: ${Math.round(sourceBytes / 1024)} → ${Math.round(full.bytes / 1024)} KB`);

@@ -1,15 +1,29 @@
-import { IMAGE_ASSETS } from './image-assets.js?v=20261018-2';
+import { IMAGE_ASSETS } from './image-assets.js?v=20261021-1';
 import { DEFAULT_GAMES } from './games.js?v=20261018-2';
 
 export const STATUSES = { backlog: 'Want to play', playing: 'Playing', completed: 'Completed' };
 const LIBRARY_KEY = 'gamelogs:library';
 let database;
 
+const assetsByPath = new Map(Object.entries(IMAGE_ASSETS).flatMap(([source, asset]) =>
+    [source, ...asset.sizes.map(size => size.src), ...(asset.aliases || [])].map(path => [path, asset])));
+
+export function imageAsset(value = '') {
+    if (typeof value !== 'string' || !value) return null;
+    if (assetsByPath.has(value)) return assetsByPath.get(value);
+    try {
+        const current = new URL(window.location.href);
+        const url = new URL(value, current);
+        // Only rewrite our bundled assets, never an external or private image URL.
+        return url.origin === current.origin ? assetsByPath.get(url.pathname.replace(/^\/+/, '')) || null : null;
+    } catch { return null; }
+}
+
 export function safeImage(value = '') {
     if (typeof value !== 'string' || !value) return '';
     try {
         const url = new URL(value, window.location.href);
-        return ['https:', 'http:'].includes(url.protocol) ? IMAGE_ASSETS[value]?.src || value : '';
+        return ['https:', 'http:'].includes(url.protocol) ? imageAsset(value)?.src || value : '';
     } catch { return ''; }
 }
 
@@ -107,7 +121,7 @@ export function validateCoverFile(file) {
     if (file.size > 10 * 1024 * 1024) throw new Error('This file exceeds 10 MB and cannot be added. Choose a smaller image — accepted uploads are resized automatically.');
 }
 
-export async function prepareCover(file, { maxDimension = 1200, maxBytes = 512 * 1024, targetBytes = 300 * 1024 } = {}) {
+export async function prepareCover(file, { maxDimension = 800, maxBytes = 256 * 1024, targetBytes = 128 * 1024 } = {}) {
     validateCoverFile(file);
     const url = URL.createObjectURL(file);
     try {

@@ -10,6 +10,8 @@ test('guest sees the original 18 optimized screenshots without upload or delete 
     assert.match(html, /The Witcher 3: Wild Hunt/);
     assert.match(html, /Cyberpunk 2077/);
     assert.match(html, /srcset="[^"]+640w/);
+    assert.doesNotMatch(html, /srcset="[^"]+1920w/);
+    assert.match(html, /href="[^"]+1920-v2\.webp"/);
     assert.doesNotMatch(html, /data-delete-screenshot=|class="gallery-upload"/);
     assert.match(html, /data-deletable="false"/);
 });
