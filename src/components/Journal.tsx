@@ -19,7 +19,7 @@ export function Journal({ onOpen }: { onOpen: (id: string) => void }) {
         <section className="journal-section page-width" id="journal" aria-labelledby="journalTitle">
             <div className="section-heading journal-heading">
                 <div className="section-title-group">
-                    <h2 id="journalTitle">Player journal</h2>
+                    <h2 id="journalTitle">Journal</h2>
                     <p className="section-caption">Your stories</p>
                 </div>
                 <p className="journal-count" role="status">
